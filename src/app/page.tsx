@@ -164,7 +164,7 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="py-6 text-center text-xs text-slate-400 border-t border-slate-100 bg-white">
-        InvoicePDF · Dibuat dengan Next.js &amp; @react-pdf/renderer
+        InvoicePDF · 2026
       </footer>
     </div>
   );
