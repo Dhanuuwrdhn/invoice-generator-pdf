@@ -18,7 +18,31 @@ function newItem(): InvoiceItem {
   };
 }
 
-const DEFAULT_DATA: InvoiceData = {
+const EMPTY_DATA: InvoiceData = {
+  senderName: '',
+  senderTitle: '',
+  senderLocation: '',
+  senderPhone: '',
+  senderEmail: '',
+  clientCompany: '',
+  clientPIC: '',
+  clientRole: '',
+  clientAddress: '',
+  clientEmail: '',
+  invoiceNumber: '',
+  invoiceType: 'DOWN PAYMENT',
+  poRef: '',
+  invoiceDate: '',
+  dueDate: '',
+  items: [newItem()],
+  discount: 0,
+  taxRate: 0,
+  bankName: '',
+  accountNumber: '',
+  accountHolder: '',
+};
+
+const TEMPLATE_DATA: InvoiceData = {
   senderName: 'Jose Veinsenli',
   senderTitle: 'IT Consultant & Developer',
   senderLocation: 'Jakarta, Indonesia',
@@ -27,7 +51,7 @@ const DEFAULT_DATA: InvoiceData = {
   clientCompany: 'Manajemen Sunny StartUp',
   clientPIC: 'Ilmi Pakarti',
   clientRole: 'CEO Sunny StartUp',
-  clientAddress: '',
+  clientAddress: '[Alamat Lengkap Sunny StartUp]',
   clientEmail: 'finance@sunnystartup.com',
   invoiceNumber: 'INV-DP/001/IV/2026',
   invoiceType: 'DOWN PAYMENT',
@@ -47,13 +71,13 @@ const DEFAULT_DATA: InvoiceData = {
   ],
   discount: 0,
   taxRate: 0,
-  bankName: '',
-  accountNumber: '',
+  bankName: '[Nama Bank Anda]',
+  accountNumber: '[Nomor Rekening Anda]',
   accountHolder: 'Jose Veinsenli',
 };
 
 export function InvoiceForm() {
-  const [data, setData] = useState<InvoiceData>(DEFAULT_DATA);
+  const [data, setData] = useState<InvoiceData>(EMPTY_DATA);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -117,11 +141,24 @@ export function InvoiceForm() {
       <div className="max-w-4xl mx-auto space-y-6">
 
         {/* Page Title */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-navy-900" style={{ fontFamily: "'Caladea', 'Cambria', Georgia, serif", color: '#1A3A5C' }}>
+        <div className="text-center mb-2">
+          <h1 className="text-3xl font-bold" style={{ fontFamily: "'Caladea', 'Cambria', Georgia, serif", color: '#1A3A5C' }}>
             Invoice Generator
           </h1>
           <p className="text-slate-500 mt-1 text-sm">Isi form di bawah, lalu klik Generate PDF</p>
+        </div>
+
+        {/* Template button */}
+        <div className="flex justify-center">
+          <button
+            type="button"
+            onClick={() => setData({ ...TEMPLATE_DATA, items: TEMPLATE_DATA.items.map(i => ({ ...i, id: crypto.randomUUID() })) })}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-full border-2 text-sm font-semibold transition-all hover:shadow-md"
+            style={{ borderColor: '#1A3A5C', color: '#1A3A5C', fontFamily: "'Caladea', 'Cambria', Georgia, serif" }}
+          >
+            <span>📄</span>
+            Gunakan Data Template
+          </button>
         </div>
 
         {/* 1. Informasi Pengirim */}
