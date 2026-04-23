@@ -1,33 +1,42 @@
 import Link from 'next/link';
+import {
+  FileText,
+  Zap,
+  Layout,
+  ClipboardList,
+  Hash,
+  Calculator,
+  ArrowRight,
+} from 'lucide-react';
 
 const FEATURES = [
   {
-    icon: '📝',
+    icon: ClipboardList,
     title: 'Form Lengkap',
     desc: 'Isi semua detail invoice: pengirim, klien, item layanan, dan informasi pembayaran.',
   },
   {
-    icon: '⚡',
+    icon: Zap,
     title: 'Generate Instan',
     desc: 'PDF profesional siap didownload dalam hitungan detik langsung dari browser.',
   },
   {
-    icon: '🎨',
+    icon: Layout,
     title: 'Desain Profesional',
     desc: 'Layout bersih dengan header navy, tabel item, terbilang, dan blok tanda tangan.',
   },
   {
-    icon: '📄',
+    icon: FileText,
     title: 'Data Template',
     desc: 'Gunakan data template bawaan sebagai contoh, lalu sesuaikan dengan kebutuhan Anda.',
   },
   {
-    icon: '🔢',
+    icon: Hash,
     title: 'Terbilang Otomatis',
     desc: 'Total tagihan otomatis dikonversi ke teks Bahasa Indonesia.',
   },
   {
-    icon: '💰',
+    icon: Calculator,
     title: 'Kalkulasi Otomatis',
     desc: 'Subtotal, diskon, pajak, dan total dihitung secara otomatis saat mengisi form.',
   },
@@ -76,10 +85,11 @@ export default function LandingPage() {
         <div className="flex flex-col sm:flex-row gap-3 items-center">
           <Link
             href="/generator"
-            className="px-8 py-4 rounded-full text-white font-bold text-base transition-all hover:opacity-90 hover:shadow-lg"
+            className="flex items-center gap-2 px-8 py-4 rounded-full text-white font-bold text-base transition-all hover:opacity-90 hover:shadow-lg"
             style={{ backgroundColor: '#1A3A5C' }}
           >
-            Mulai Buat Invoice →
+            Mulai Buat Invoice
+            <ArrowRight size={16} />
           </Link>
           <a
             href="#fitur"
@@ -90,7 +100,6 @@ export default function LandingPage() {
           </a>
         </div>
 
-        {/* Preview badge */}
         <div className="mt-16 flex items-center gap-3 text-slate-400 text-sm">
           <span className="h-px w-12 bg-slate-200" />
           Format A4 · Font Caladea · Layout Profesional
@@ -111,18 +120,26 @@ export default function LandingPage() {
             Dirancang untuk freelancer dan konsultan independen
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {FEATURES.map((f) => (
-              <div
-                key={f.title}
-                className="bg-white rounded-xl p-6 border border-slate-100 hover:shadow-md transition-shadow"
-              >
-                <div className="text-2xl mb-3">{f.icon}</div>
-                <h3 className="font-bold text-sm mb-1" style={{ color: '#1A3A5C' }}>
-                  {f.title}
-                </h3>
-                <p className="text-slate-500 text-sm leading-relaxed">{f.desc}</p>
-              </div>
-            ))}
+            {FEATURES.map((f) => {
+              const Icon = f.icon;
+              return (
+                <div
+                  key={f.title}
+                  className="bg-white rounded-xl p-6 border border-slate-100 hover:shadow-md transition-shadow"
+                >
+                  <div
+                    className="w-9 h-9 rounded-lg flex items-center justify-center mb-4"
+                    style={{ backgroundColor: '#F0F4F8' }}
+                  >
+                    <Icon size={18} style={{ color: '#1A3A5C' }} />
+                  </div>
+                  <h3 className="font-bold text-sm mb-1" style={{ color: '#1A3A5C' }}>
+                    {f.title}
+                  </h3>
+                  <p className="text-slate-500 text-sm leading-relaxed">{f.desc}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -137,16 +154,17 @@ export default function LandingPage() {
         </p>
         <Link
           href="/generator"
-          className="inline-block px-10 py-4 rounded-full font-bold text-base transition-all hover:opacity-90"
+          className="inline-flex items-center gap-2 px-10 py-4 rounded-full font-bold text-base transition-all hover:opacity-90"
           style={{ backgroundColor: '#ffffff', color: '#1A3A5C' }}
         >
-          Buat Invoice Sekarang →
+          Buat Invoice Sekarang
+          <ArrowRight size={16} />
         </Link>
       </section>
 
       {/* Footer */}
       <footer className="py-6 text-center text-xs text-slate-400 border-t border-slate-100 bg-white">
-        InvoicePDF · Dibuat dengan Next.js & @react-pdf/renderer
+        InvoicePDF · Dibuat dengan Next.js &amp; @react-pdf/renderer
       </footer>
     </div>
   );

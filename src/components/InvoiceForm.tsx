@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { FileText, Download, Plus, X } from 'lucide-react';
 import { InvoiceData, InvoiceItem } from '@/types/invoice';
 import { calcSubtotal, calcTax, calcTotal, formatCurrency } from '@/lib/format';
 
@@ -156,7 +157,7 @@ export function InvoiceForm() {
             className="flex items-center gap-2 px-5 py-2.5 rounded-full border-2 text-sm font-semibold transition-all hover:shadow-md"
             style={{ borderColor: '#1A3A5C', color: '#1A3A5C', fontFamily: "'Caladea', 'Cambria', Georgia, serif" }}
           >
-            <span>📄</span>
+            <FileText size={15} />
             Gunakan Data Template
           </button>
         </div>
@@ -253,7 +254,7 @@ export function InvoiceForm() {
                       onClick={() => removeItem(item.id)}
                       className="text-red-400 hover:text-red-600 text-sm font-medium transition-colors"
                     >
-                      × Hapus
+                      <X size={14} className="inline mr-1" />Hapus
                     </button>
                   )}
                 </div>
@@ -315,9 +316,9 @@ export function InvoiceForm() {
             <button
               type="button"
               onClick={addItem}
-              className="w-full border-2 border-dashed border-slate-300 rounded-lg py-3 text-sm text-slate-500 hover:border-blue-400 hover:text-blue-500 transition-colors"
+              className="w-full border-2 border-dashed border-slate-300 rounded-lg py-3 text-sm text-slate-500 hover:border-blue-400 hover:text-blue-500 transition-colors flex items-center justify-center gap-1.5"
             >
-              + Tambah Item
+              <Plus size={14} />Tambah Item
             </button>
           </div>
         </Section>
@@ -385,7 +386,10 @@ export function InvoiceForm() {
           className="w-full py-4 rounded-xl text-white font-bold text-base transition-all disabled:opacity-60 disabled:cursor-not-allowed"
           style={{ backgroundColor: '#1A3A5C', fontFamily: "'Caladea', 'Cambria', Georgia, serif" }}
         >
-          {loading ? 'Membuat PDF...' : '⬇ Generate & Download PDF'}
+          <span className="flex items-center justify-center gap-2">
+            <Download size={16} />
+            {loading ? 'Membuat PDF...' : 'Generate & Download PDF'}
+          </span>
         </button>
 
       </div>
