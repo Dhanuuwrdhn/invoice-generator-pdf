@@ -5,17 +5,23 @@ import { InvoicePDF } from '@/components/pdf/InvoicePDF';
 import { InvoiceData } from '@/types/invoice';
 
 export async function POST(request: NextRequest) {
-  const data: InvoiceData = await request.json();
+  try {
+    const data: InvoiceData = await request.json();
 
-  const element = React.createElement(InvoicePDF, { data }) as React.ReactElement<DocumentProps>;
-  const buffer = await renderToBuffer(element);
+    const element = React.createElement(InvoicePDF, { data }) as React.ReactElement<DocumentProps>;
+    const buffer = await renderToBuffer(element);
 
-  const filename = `Invoice_${data.invoiceNumber.replace(/\//g, '-')}.pdf`;
+    const filename = `Invoice_${data.invoiceNumber.replace(/\//g, '-')}.pdf`;
 
-  return new NextResponse(new Uint8Array(buffer), {
-    headers: {
-      'Content-Type': 'application/pdf',
-      'Content-Disposition': `attachment; filename="${filename}"`,
-    },
-  });
+    return new NextResponse(new Uint8Array(buffer), {
+      headers: {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `attachment; filename="${filename}"`,
+      },
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error('[generate-pdf]', err);
+    return new NextResponse(message, { status: 500 });
+  }
 }

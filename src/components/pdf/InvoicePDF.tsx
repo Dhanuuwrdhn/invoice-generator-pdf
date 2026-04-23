@@ -1,16 +1,19 @@
 import React from 'react';
+import path from 'path';
 import { Document, Page, View, Text, StyleSheet, Font } from '@react-pdf/renderer';
 import { InvoiceData, InvoiceItem } from '@/types/invoice';
 import { formatCurrency, calcSubtotal, calcTax, calcTotal } from '@/lib/format';
 import { numberToWords } from '@/lib/terbilang';
 
+const fontsDir = path.join(process.cwd(), 'public', 'fonts');
+
 Font.register({
   family: 'Caladea',
   fonts: [
-    { src: 'https://fonts.gstatic.com/s/caladea/v10/H4c2BXOCl9bbnla_nHIiWLQ.ttf' },
-    { src: 'https://fonts.gstatic.com/s/caladea/v10/H4c8BXOCl9bbnla_nHIi4LaxaD0.ttf', fontWeight: 'bold' },
-    { src: 'https://fonts.gstatic.com/s/caladea/v10/H4c0BXOCl9bbnla_nHIqWpDhyS5_.ttf', fontStyle: 'italic' },
-    { src: 'https://fonts.gstatic.com/s/caladea/v10/H4c-BXOCl9bbnla_nHIqWp76pSNkJjI.ttf', fontWeight: 'bold', fontStyle: 'italic' },
+    { src: path.join(fontsDir, 'caladea-regular.ttf') },
+    { src: path.join(fontsDir, 'caladea-bold.ttf'), fontWeight: 'bold' },
+    { src: path.join(fontsDir, 'caladea-italic.ttf'), fontStyle: 'italic' },
+    { src: path.join(fontsDir, 'caladea-bold-italic.ttf'), fontWeight: 'bold', fontStyle: 'italic' },
   ],
 });
 
