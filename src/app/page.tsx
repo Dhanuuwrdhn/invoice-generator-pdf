@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowRight, FileText, Zap, Layout, Hash, Calculator, ClipboardList } from 'lucide-react';
+import { ArrowRight, FileText, Zap, Layout, Hash, Calculator, ClipboardList, Heart } from 'lucide-react';
 
 const FEATURES = [
   { icon: ClipboardList, title: 'Complete Form',       desc: 'Fill in every detail — sender, client, line items, and payment info.' },
@@ -72,7 +72,14 @@ export default function LandingPage() {
             className="flex items-center gap-2 px-8 py-4 rounded-full font-bold text-base text-white transition-all hover:opacity-90 hover:shadow-xl hover:-translate-y-0.5"
             style={{ background: 'linear-gradient(135deg, #1A3A5C, #2A6496)', boxShadow: '0 0 30px rgba(42,100,150,0.4)' }}
           >
-            Start Building <ArrowRight size={16} />
+            Invoice Generator <ArrowRight size={16} />
+          </Link>
+          <Link
+            href="/invitation/new"
+            className="flex items-center gap-2 px-8 py-4 rounded-full font-bold text-base text-white transition-all hover:opacity-90 hover:shadow-xl hover:-translate-y-0.5"
+            style={{ background: 'linear-gradient(135deg, #7C1A3A, #9F1239)', boxShadow: '0 0 30px rgba(159,18,57,0.35)' }}
+          >
+            <Heart size={16} /> Undangan Online
           </Link>
           <a
             href="#features"
