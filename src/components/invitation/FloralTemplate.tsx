@@ -1,150 +1,237 @@
 'use client';
 
-import { useRef, useState, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Invitation } from '@/types/invitation';
+import { MusicPlayer, Reveal } from './shared';
 
-function MusicPlayer({ url, color }: { url: string; color: string }) {
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const [playing, setPlaying] = useState(false);
-  useEffect(() => { if (audioRef.current) { audioRef.current.loop = true; audioRef.current.volume = 0.5; } }, []);
-  function toggle() {
-    const a = audioRef.current; if (!a) return;
-    if (playing) { a.pause(); setPlaying(false); } else { a.play().then(() => setPlaying(true)); }
-  }
+function Divider({ color }: { color: string }) {
   return (
-    <>
-      <audio ref={audioRef} src={url} preload="none" />
-      <button onClick={toggle} title={playing ? 'Pause' : 'Play'}
-        className="fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-110"
-        style={{ backgroundColor: color }}>
-        {playing ? (
-          <span className="flex items-end gap-0.5 h-5">
-            {[1,2,3].map(i => (
-              <span key={i} className="w-1 rounded-full bg-white"
-                style={{ height: `${i===2?100:60}%`, animation: `fb${i} 0.8s ease-in-out infinite alternate`, animationDelay: `${(i-1)*0.15}s` }} />
-            ))}
-          </span>
-        ) : (
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <path d="M9 18V5l12-2v13" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <circle cx="6" cy="18" r="3" fill="white"/><circle cx="18" cy="16" r="3" fill="white"/>
-          </svg>
-        )}
-      </button>
-      <style>{`@keyframes fb1{from{height:30%}to{height:90%}}@keyframes fb2{from{height:70%}to{height:30%}}@keyframes fb3{from{height:50%}to{height:100%}}`}</style>
-    </>
+    <div className="flex items-center justify-center gap-3 my-2">
+      <div className="w-12 h-px" style={{ backgroundColor: `${color}44` }} />
+      <span className="text-lg" style={{ color: `${color}88` }}>✦</span>
+      <div className="w-12 h-px" style={{ backgroundColor: `${color}44` }} />
+    </div>
   );
 }
 
 export function FloralTemplate({ inv }: { inv: Invitation }) {
-  const P = inv.primary_color || '#9F1239';
+  const P   = inv.primary_color || '#9F1239';
+  const heroRef = useRef<HTMLDivElement>(null);
+  const [heroVisible, setHeroVisible] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setHeroVisible(true), 100);
+    return () => clearTimeout(t);
+  }, []);
 
   return (
-    <div className="min-h-screen w-full" style={{ fontFamily: "'Caladea','Cambria',Georgia,serif", backgroundColor: '#FFFBF5' }}>
+    <div className="min-h-screen w-full overflow-x-hidden" style={{ fontFamily: "'Cormorant Garamond','Caladea',Georgia,serif", backgroundColor: '#FFFBF5' }}>
       {inv.music_url && <MusicPlayer url={inv.music_url} color={P} />}
 
       {/* ── Hero ── */}
-      <section className="relative flex flex-col items-center justify-center text-center px-6 pt-16 pb-12 overflow-hidden"
-        style={{ background: inv.cover_image_url ? `linear-gradient(rgba(0,0,0,0.38),rgba(0,0,0,0.38)) , url(${inv.cover_image_url}) center/cover` : '#FFFBF5' }}>
+      <section
+        ref={heroRef}
+        className="relative min-h-screen flex flex-col items-center justify-center text-center px-6 overflow-hidden"
+        style={{
+          background: inv.cover_image_url
+            ? `linear-gradient(rgba(0,0,0,0.38),rgba(0,0,0,0.50)), url(${inv.cover_image_url}) center/cover`
+            : `linear-gradient(160deg, #FFF0F3 0%, #FDEEF4 50%, #FFF8F0 100%)`,
+        }}
+      >
+        {/* Decorative corner flowers */}
+        {!inv.cover_image_url && (
+          <>
+            <div className="absolute top-0 left-0 text-6xl pointer-events-none select-none leading-none" style={{ color: `${P}22`, lineHeight: 1 }}>❀</div>
+            <div className="absolute top-0 right-0 text-6xl pointer-events-none select-none leading-none" style={{ color: `${P}22`, lineHeight: 1 }}>❀</div>
+            <div className="absolute bottom-0 left-0 text-6xl pointer-events-none select-none leading-none" style={{ color: `${P}22`, lineHeight: 1 }}>❀</div>
+            <div className="absolute bottom-0 right-0 text-6xl pointer-events-none select-none leading-none" style={{ color: `${P}22`, lineHeight: 1 }}>❀</div>
+          </>
+        )}
 
-        {/* Top floral border */}
-        <div className="absolute top-0 left-0 w-full text-center text-4xl pointer-events-none select-none leading-none py-2" style={{ color: inv.cover_image_url ? 'rgba(255,255,255,0.5)' : `${P}55` }}>
-          ✿ ❀ ✿ ❀ ✿ ❀ ✿ ❀ ✿ ❀ ✿ ❀ ✿
-        </div>
-
-        <div className="mt-10">
-          <p className="text-xs tracking-[0.3em] uppercase mb-6" style={{ color: inv.cover_image_url ? 'rgba(255,255,255,0.7)' : `${P}99` }}>
-            Undangan Pernikahan
+        <div style={{
+          opacity: heroVisible ? 1 : 0,
+          transform: heroVisible ? 'none' : 'translateY(24px)',
+          transition: 'opacity 1.2s cubic-bezier(.22,1,.36,1), transform 1.2s cubic-bezier(.22,1,.36,1)',
+        }}>
+          <p className="text-xs tracking-[0.35em] uppercase mb-4 font-semibold"
+            style={{ color: inv.cover_image_url ? 'rgba(255,255,255,0.7)' : `${P}99` }}>
+            The Wedding Of
           </p>
 
-          <div className="text-5xl mb-4" style={{ color: inv.cover_image_url ? 'rgba(255,255,255,0.4)' : `${P}33` }}>❧</div>
-
-          <h1 className="font-bold leading-tight mb-2" style={{ fontSize:'clamp(2.2rem,7vw,4rem)', color: inv.cover_image_url ? '#fff' : P }}>
+          <h1
+            className="leading-tight mb-1"
+            style={{
+              fontFamily: "'Dancing Script', cursive",
+              fontSize: 'clamp(3.5rem, 12vw, 6.5rem)',
+              color: inv.cover_image_url ? '#fff' : P,
+              textShadow: inv.cover_image_url ? '0 2px 20px rgba(0,0,0,0.3)' : 'none',
+            }}
+          >
             {inv.groom_name}
           </h1>
-          <p className="text-2xl italic mb-2" style={{ color: inv.cover_image_url ? 'rgba(255,255,255,0.7)' : `${P}99` }}>& </p>
-          <h1 className="font-bold leading-tight mb-6" style={{ fontSize:'clamp(2.2rem,7vw,4rem)', color: inv.cover_image_url ? '#fff' : P }}>
+
+          <div style={{
+            opacity: heroVisible ? 1 : 0,
+            transition: 'opacity 1.2s ease 0.3s',
+            color: inv.cover_image_url ? 'rgba(255,255,255,0.6)' : `${P}77`,
+            fontFamily: "'Dancing Script', cursive",
+            fontSize: '2rem',
+          }}>
+            &amp;
+          </div>
+
+          <h1
+            className="leading-tight"
+            style={{
+              fontFamily: "'Dancing Script', cursive",
+              fontSize: 'clamp(3.5rem, 12vw, 6.5rem)',
+              color: inv.cover_image_url ? '#fff' : P,
+              textShadow: inv.cover_image_url ? '0 2px 20px rgba(0,0,0,0.3)' : 'none',
+              opacity: heroVisible ? 1 : 0,
+              transform: heroVisible ? 'none' : 'translateY(16px)',
+              transition: 'opacity 1.2s cubic-bezier(.22,1,.36,1) 0.2s, transform 1.2s cubic-bezier(.22,1,.36,1) 0.2s',
+            }}
+          >
             {inv.bride_name}
           </h1>
 
           {inv.reception_date && (
-            <div className="inline-flex items-center gap-3 px-6 py-2 rounded-full text-sm"
-              style={{ backgroundColor: inv.cover_image_url ? 'rgba(255,255,255,0.15)' : `${P}15`, color: inv.cover_image_url ? '#fff' : P, border:`1px solid ${inv.cover_image_url ? 'rgba(255,255,255,0.3)' : `${P}40`}` }}>
-              ✦ {inv.reception_date} ✦
+            <div style={{
+              opacity: heroVisible ? 1 : 0,
+              transition: 'opacity 1s ease 0.6s',
+              marginTop: '1.5rem',
+            }}>
+              <p className="text-sm tracking-[0.25em] uppercase"
+                style={{ color: inv.cover_image_url ? 'rgba(255,255,255,0.7)' : `${P}99` }}>
+                {inv.reception_date}
+              </p>
             </div>
           )}
         </div>
 
-        {/* Bottom floral border */}
-        <div className="absolute bottom-0 left-0 w-full text-center text-4xl pointer-events-none select-none leading-none py-2" style={{ color: inv.cover_image_url ? 'rgba(255,255,255,0.5)' : `${P}55` }}>
-          ✿ ❀ ✿ ❀ ✿ ❀ ✿ ❀ ✿ ❀ ✿ ❀ ✿
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2" style={{ animation: 'inv-bounce 2s ease-in-out infinite' }}>
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M5 7l5 6 5-6" stroke={inv.cover_image_url ? 'rgba(255,255,255,0.5)' : `${P}66`} strokeWidth="2" strokeLinecap="round"/>
+          </svg>
         </div>
       </section>
 
-      {/* ── Opening ── */}
-      <section className="py-16 px-6 text-center max-w-xl mx-auto">
-        <div className="text-3xl mb-6" style={{ color: `${P}66` }}>✾</div>
-        <p className="text-slate-500 italic leading-relaxed text-sm">
-          {inv.opening_message || 'Dengan memohon rahmat dan ridha Allah SWT, kami mengundang kehadiran Bapak/Ibu/Saudara/i pada pernikahan putra-putri kami.'}
-        </p>
-        <div className="text-3xl mt-6" style={{ color: `${P}66` }}>✾</div>
+      {/* ── Opening quote ── */}
+      <section className="py-20 px-6 text-center max-w-lg mx-auto">
+        <Reveal delay={0}>
+          <Divider color={P} />
+          <p className="text-slate-500 leading-relaxed mt-6 text-base italic" style={{ fontStyle: 'italic' }}>
+            {inv.opening_message || 'Dengan memohon rahmat dan ridha Allah SWT, kami bermaksud mengundang kehadiran Bapak/Ibu/Saudara/i pada pernikahan putra-putri kami.'}
+          </p>
+          <Divider color={P} />
+        </Reveal>
       </section>
 
       {/* ── Couple ── */}
-      <section className="py-10 px-6 max-w-2xl mx-auto">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 text-center">
+      <section className="py-10 px-6" style={{ backgroundColor: `${P}07` }}>
+        <div className="max-w-2xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-8">
           {[
-            { name: inv.groom_name, parents: inv.groom_parents },
-            { name: inv.bride_name, parents: inv.bride_parents },
-          ].map((p, i) => (
-            <div key={i} className="rounded-2xl p-8 border" style={{ backgroundColor: `${P}08`, borderColor: `${P}22` }}>
-              <div className="text-4xl mb-3" style={{ color: `${P}66` }}>❀</div>
-              <h3 className="font-bold text-xl mb-2" style={{ color: P }}>{p.name}</h3>
-              {p.parents && <p className="text-sm text-slate-500 italic leading-relaxed">Putra/Putri dari<br />{p.parents}</p>}
-            </div>
+            { name: inv.groom_name, parents: inv.groom_parents, label: 'Mempelai Pria', dir: 'left' as const },
+            { name: inv.bride_name, parents: inv.bride_parents, label: 'Mempelai Wanita', dir: 'right' as const },
+          ].map((p) => (
+            <Reveal key={p.label} direction={p.dir}>
+              <div className="text-center rounded-3xl p-8 bg-white shadow-sm border" style={{ borderColor: `${P}18` }}>
+                <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center text-2xl"
+                  style={{ background: `linear-gradient(135deg, ${P}22, ${P}44)` }}>
+                  <span style={{ fontFamily: "'Dancing Script', cursive", color: P, fontSize: '1.8rem' }}>
+                    {p.name?.[0]}
+                  </span>
+                </div>
+                <p className="text-xs tracking-widest uppercase mb-2" style={{ color: `${P}88` }}>{p.label}</p>
+                <h3 style={{ fontFamily: "'Dancing Script', cursive", fontSize: '2rem', color: P }}>{p.name}</h3>
+                {p.parents && (
+                  <p className="text-sm text-slate-400 mt-2 italic leading-relaxed">
+                    Putra/Putri dari<br />
+                    <span className="text-slate-600 not-italic font-medium">{p.parents}</span>
+                  </p>
+                )}
+              </div>
+            </Reveal>
           ))}
         </div>
       </section>
 
       {/* ── Events ── */}
-      <section className="py-14 px-6 text-center" style={{ backgroundColor: `${P}0a` }}>
-        <div className="text-3xl mb-4" style={{ color: `${P}55` }}>❦</div>
-        <h2 className="font-bold text-2xl mb-10" style={{ color: P }}>Rangkaian Acara</h2>
+      <section className="py-20 px-6">
+        <Reveal>
+          <div className="text-center mb-12">
+            <p className="text-xs tracking-[0.3em] uppercase mb-2" style={{ color: `${P}88` }}>Rangkaian</p>
+            <h2 style={{ fontFamily: "'Dancing Script', cursive", fontSize: '2.8rem', color: P }}>Acara</h2>
+            <Divider color={P} />
+          </div>
+        </Reveal>
+
         <div className="max-w-2xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-5">
           {inv.akad_date && (
-            <div className="bg-white rounded-2xl p-6 border shadow-sm" style={{ borderColor: `${P}22` }}>
-              <div className="text-3xl mb-3" style={{ color: `${P}88` }}>☽</div>
-              <h3 className="font-bold mb-1" style={{ color: P }}>Akad Nikah</h3>
-              <p className="text-sm font-semibold text-slate-700">{inv.akad_date}</p>
-              {inv.akad_time && <p className="text-sm text-slate-500">{inv.akad_time}</p>}
-              {inv.akad_venue && <p className="text-sm font-medium text-slate-700 mt-2">{inv.akad_venue}</p>}
-              {inv.akad_address && <p className="text-xs text-slate-400 mt-1">{inv.akad_address}</p>}
-            </div>
+            <Reveal delay={100} direction="left">
+              <div className="rounded-3xl overflow-hidden shadow-sm border bg-white" style={{ borderColor: `${P}18` }}>
+                <div className="h-2 w-full" style={{ background: `linear-gradient(90deg, ${P}, ${P}88)` }} />
+                <div className="p-7 text-center">
+                  <p className="text-3xl mb-3" style={{ color: `${P}66` }}>☽</p>
+                  <h3 className="font-semibold mb-3" style={{ color: P }}>Akad Nikah</h3>
+                  <p className="font-semibold text-slate-700">{inv.akad_date}</p>
+                  {inv.akad_time && <p className="text-sm text-slate-500 mt-1">{inv.akad_time}</p>}
+                  {inv.akad_venue && (
+                    <div className="mt-4 pt-4 border-t" style={{ borderColor: `${P}18` }}>
+                      <p className="font-medium text-slate-700">{inv.akad_venue}</p>
+                      {inv.akad_address && <p className="text-xs text-slate-400 mt-1">{inv.akad_address}</p>}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </Reveal>
           )}
+
           {inv.reception_date && (
-            <div className="bg-white rounded-2xl p-6 border shadow-sm" style={{ borderColor: `${P}22` }}>
-              <div className="text-3xl mb-3" style={{ color: `${P}88` }}>☀</div>
-              <h3 className="font-bold mb-1" style={{ color: P }}>Resepsi</h3>
-              <p className="text-sm font-semibold text-slate-700">{inv.reception_date}</p>
-              {inv.reception_time && <p className="text-sm text-slate-500">{inv.reception_time}</p>}
-              {inv.reception_venue && <p className="text-sm font-medium text-slate-700 mt-2">{inv.reception_venue}</p>}
-              {inv.reception_address && <p className="text-xs text-slate-400 mt-1">{inv.reception_address}</p>}
-            </div>
+            <Reveal delay={200} direction="right">
+              <div className="rounded-3xl overflow-hidden shadow-sm border bg-white" style={{ borderColor: `${P}18` }}>
+                <div className="h-2 w-full" style={{ background: `linear-gradient(90deg, ${P}88, ${P})` }} />
+                <div className="p-7 text-center">
+                  <p className="text-3xl mb-3" style={{ color: `${P}66` }}>♡</p>
+                  <h3 className="font-semibold mb-3" style={{ color: P }}>Resepsi</h3>
+                  <p className="font-semibold text-slate-700">{inv.reception_date}</p>
+                  {inv.reception_time && <p className="text-sm text-slate-500 mt-1">{inv.reception_time}</p>}
+                  {inv.reception_venue && (
+                    <div className="mt-4 pt-4 border-t" style={{ borderColor: `${P}18` }}>
+                      <p className="font-medium text-slate-700">{inv.reception_venue}</p>
+                      {inv.reception_address && <p className="text-xs text-slate-400 mt-1">{inv.reception_address}</p>}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </Reveal>
           )}
         </div>
-        <div className="text-3xl mt-10" style={{ color: `${P}55` }}>❦</div>
       </section>
 
       {/* ── Closing ── */}
-      <section className="py-16 px-6 text-center max-w-xl mx-auto">
-        <div className="text-3xl mb-6" style={{ color: `${P}55` }}>✿ ❀ ✿</div>
-        <p className="text-slate-500 italic text-sm leading-relaxed">
-          {inv.closing_message || 'Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu.'}
-        </p>
-        <p className="mt-8 font-bold text-lg" style={{ color: P }}>{inv.groom_name} & {inv.bride_name}</p>
-        <p className="text-sm text-slate-400 mt-1">Beserta keluarga besar</p>
-        <div className="text-3xl mt-6" style={{ color: `${P}55` }}>✿ ❀ ✿</div>
+      <section className="py-20 px-6 text-center max-w-lg mx-auto">
+        <Reveal>
+          <Divider color={P} />
+          <p className="text-slate-500 text-base italic leading-relaxed mt-6">
+            {inv.closing_message || 'Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu kepada kedua mempelai.'}
+          </p>
+          <div className="mt-10">
+            <p style={{ fontFamily: "'Dancing Script', cursive", fontSize: '2.2rem', color: P }}>
+              {inv.groom_name} &amp; {inv.bride_name}
+            </p>
+            <p className="text-xs tracking-widest uppercase text-slate-400 mt-2">Beserta Keluarga Besar</p>
+          </div>
+          <Divider color={P} />
+        </Reveal>
       </section>
+
+      <style>{`
+        @keyframes inv-bounce {
+          0%, 100% { transform: translateX(-50%) translateY(0); }
+          50%       { transform: translateX(-50%) translateY(8px); }
+        }
+      `}</style>
     </div>
   );
 }
