@@ -27,9 +27,22 @@ const FONT_CSS: Record<FontChoice, string> = {
 
 // ── Built-in templates ─────────────────────────────────────────────────────────
 
+// ── Color presets ──────────────────────────────────────────────────────────────
+
+const COLOR_PRESETS = [
+  { label: 'Navy',    value: '#1A3A5C' },
+  { label: 'Forest',  value: '#1A6B3C' },
+  { label: 'Indigo',  value: '#3730A3' },
+  { label: 'Violet',  value: '#6D28D9' },
+  { label: 'Rose',    value: '#BE123C' },
+  { label: 'Amber',   value: '#B45309' },
+  { label: 'Slate',   value: '#334155' },
+];
+
 // Template A — IT Consultant, DOWN PAYMENT (Termin I dari III)
 const TPL_A: InvoiceData = {
   fontFamily: 'Caladea',
+  primaryColor: '#1A3A5C',
   senderName: 'Ahmad Rizki Pratama',
   senderTitle: 'IT Consultant & Developer',
   senderLocation: 'Jakarta, Indonesia',
@@ -61,6 +74,7 @@ const TPL_A: InvoiceData = {
 // Template B — UI/UX Designer, TERMIN II dari IV
 const TPL_B: InvoiceData = {
   fontFamily: 'Lato',
+  primaryColor: '#1A6B3C',
   senderName: 'Rina Kusuma Dewi',
   senderTitle: 'Freelance UI/UX Designer',
   senderLocation: 'Bandung, Indonesia',
@@ -101,6 +115,7 @@ const TPL_B: InvoiceData = {
 // Template C — Software Agency, TERMIN III dari V
 const TPL_C: InvoiceData = {
   fontFamily: 'Montserrat',
+  primaryColor: '#3730A3',
   senderName: 'PT. CodeCraft Solutions',
   senderTitle: 'Software Development Agency',
   senderLocation: 'Surabaya, Indonesia',
@@ -144,6 +159,7 @@ const LS_KEY = 'invoice_saved_templates';
 function emptyData(): InvoiceData {
   return {
     fontFamily: 'Caladea',
+    primaryColor: '#1A3A5C',
     senderName: '', senderTitle: '', senderLocation: '', senderPhone: '', senderEmail: '',
     clientCompany: '', clientPIC: '', clientRole: '', clientAddress: '', clientEmail: '',
     invoiceNumber: '', invoiceType: 'DOWN PAYMENT', poRef: '',
@@ -249,12 +265,12 @@ export function InvoiceForm() {
             <ArrowLeft size={15} />
             <span className="text-sm font-medium">Back</span>
           </Link>
-          <span className="font-bold text-base" style={{ color: '#1A3A5C' }}>Invoice Generator</span>
+          <span className="font-bold text-base" style={{ color: data.primaryColor }}>Invoice Generator</span>
           <button
             onClick={handleGenerate}
             disabled={loading}
             className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-white text-sm font-semibold transition-all disabled:opacity-50 shrink-0"
-            style={{ backgroundColor: '#1A3A5C' }}
+            style={{ backgroundColor: data.primaryColor }}
           >
             <Download size={14} />
             {loading ? 'Generating…' : 'Generate PDF'}
@@ -277,16 +293,56 @@ export function InvoiceForm() {
                   <button
                     key={f.value}
                     onClick={() => set('fontFamily', f.value)}
-                    className={`flex flex-col items-start px-4 py-2.5 rounded-lg border-2 transition-all ${
-                      active ? 'border-[#1A3A5C] bg-[#F0F4F8]' : 'border-slate-200 hover:border-slate-300 bg-white'
-                    }`}
-                    style={{ fontFamily: FONT_CSS[f.value] }}
+                    className="flex flex-col items-start px-4 py-2.5 rounded-lg border-2 transition-all"
+                    style={{
+                      fontFamily: FONT_CSS[f.value],
+                      borderColor: active ? data.primaryColor : '#e2e8f0',
+                      backgroundColor: active ? '#F0F4F8' : '#fff',
+                    }}
                   >
-                    <span className={`text-sm font-bold ${active ? 'text-[#1A3A5C]' : 'text-slate-700'}`}>{f.label}</span>
+                    <span className="text-sm font-bold" style={{ color: active ? data.primaryColor : '#374151' }}>{f.label}</span>
                     <span className="text-xs text-slate-400">{f.desc}</span>
                   </button>
                 );
               })}
+            </div>
+          </div>
+
+          {/* Color picker */}
+          <div className="px-5 py-4">
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-3">PDF Color</p>
+            <div className="flex items-center gap-2 flex-wrap">
+              {COLOR_PRESETS.map(c => {
+                const active = data.primaryColor === c.value;
+                return (
+                  <button
+                    key={c.value}
+                    title={c.label}
+                    onClick={() => set('primaryColor', c.value)}
+                    className="w-7 h-7 rounded-full transition-all"
+                    style={{
+                      backgroundColor: c.value,
+                      outline: active ? `3px solid ${c.value}` : '2px solid transparent',
+                      outlineOffset: active ? '2px' : '0',
+                      boxShadow: active ? '0 0 0 1px #fff inset' : undefined,
+                    }}
+                  />
+                );
+              })}
+              <label
+                title="Custom color"
+                className="w-7 h-7 rounded-full border-2 border-dashed border-slate-300 flex items-center justify-center cursor-pointer overflow-hidden hover:border-slate-400 transition-colors"
+                style={{ position: 'relative' }}
+              >
+                <input
+                  type="color"
+                  value={data.primaryColor}
+                  onChange={e => set('primaryColor', e.target.value)}
+                  className="opacity-0 absolute inset-0 w-full h-full cursor-pointer"
+                />
+                <span className="text-slate-400 text-xs font-bold pointer-events-none">+</span>
+              </label>
+              <span className="text-xs text-slate-400 font-mono">{data.primaryColor}</span>
             </div>
           </div>
 
@@ -364,7 +420,7 @@ export function InvoiceForm() {
                     placeholder="Template name…"
                     className="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 w-44"
                   />
-                  <button onClick={handleSave} className="px-3 py-2 rounded-lg text-white text-sm font-semibold" style={{ backgroundColor: '#1A3A5C' }}>Save</button>
+                  <button onClick={handleSave} className="px-3 py-2 rounded-lg text-white text-sm font-semibold" style={{ backgroundColor: data.primaryColor }}>Save</button>
                   <button onClick={() => { setSaveMode(false); setSaveName(''); }} className="px-3 py-2 rounded-lg border border-slate-200 text-sm text-slate-500 hover:bg-slate-50">Cancel</button>
                 </div>
               )}
@@ -377,7 +433,7 @@ export function InvoiceForm() {
         {templateOpen && <div className="fixed inset-0 z-10" onClick={() => setTemplateOpen(false)} />}
 
         {/* ── 1. Sender Information ── */}
-        <Section title="Sender Information">
+        <Section title="Sender Information" color={data.primaryColor}>
           <Grid>
             <Field label="Full Name">
               <Input value={data.senderName} onChange={v => set('senderName', v)} placeholder="Your name" fontCss={fontCss} />
@@ -398,7 +454,7 @@ export function InvoiceForm() {
         </Section>
 
         {/* ── 2. Client Information ── */}
-        <Section title="Client Information">
+        <Section title="Client Information" color={data.primaryColor}>
           <Grid>
             <Field label="Company Name">
               <Input value={data.clientCompany} onChange={v => set('clientCompany', v)} placeholder="PT. Company Name" fontCss={fontCss} />
@@ -426,7 +482,7 @@ export function InvoiceForm() {
         </Section>
 
         {/* ── 3. Invoice Details ── */}
-        <Section title="Invoice Details">
+        <Section title="Invoice Details" color={data.primaryColor}>
           <Grid>
             <Field label="Invoice Number">
               <Input value={data.invoiceNumber} onChange={v => set('invoiceNumber', v)} placeholder="INV-DP/001/IV/2026" fontCss={fontCss} />
@@ -458,7 +514,7 @@ export function InvoiceForm() {
         </Section>
 
         {/* ── 4. Service Items ── */}
-        <Section title="Service Items">
+        <Section title="Service Items" color={data.primaryColor}>
           <div className="space-y-3">
             {data.items.map((item, i) => (
               <div key={item.id} className="rounded-lg border border-slate-200 bg-slate-50 overflow-hidden">
@@ -500,7 +556,10 @@ export function InvoiceForm() {
             ))}
             <button
               onClick={() => setData(p => ({ ...p, items: [...p.items, newItem()] }))}
-              className="w-full flex items-center justify-center gap-1.5 border-2 border-dashed border-slate-300 rounded-lg py-3 text-sm text-slate-400 hover:border-[#1A3A5C] hover:text-[#1A3A5C] transition-colors font-medium"
+              className="w-full flex items-center justify-center gap-1.5 border-2 border-dashed border-slate-300 rounded-lg py-3 text-sm text-slate-400 transition-colors font-medium hover:border-current hover:text-current"
+              style={{ '--hover-color': data.primaryColor } as React.CSSProperties}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = data.primaryColor; (e.currentTarget as HTMLElement).style.color = data.primaryColor; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = ''; (e.currentTarget as HTMLElement).style.color = ''; }}
             >
               <Plus size={14} /> Add Item
             </button>
@@ -508,7 +567,7 @@ export function InvoiceForm() {
         </Section>
 
         {/* ── 5. Payment Information ── */}
-        <Section title="Payment Information">
+        <Section title="Payment Information" color={data.primaryColor}>
           <Grid>
             <Field label="Bank Name">
               <Input value={data.bankName} onChange={v => set('bankName', v)} placeholder="BCA / Mandiri / BNI" fontCss={fontCss} />
@@ -523,7 +582,7 @@ export function InvoiceForm() {
         </Section>
 
         {/* ── 6. Summary ── */}
-        <Section title="Summary">
+        <Section title="Summary" color={data.primaryColor}>
           <Grid>
             <Field label="Discount (Rp)">
               <Input value={String(data.discount)} onChange={v => set('discount', parseFloat(v) || 0)} type="number" min="0" placeholder="0" fontCss={fontCss} />
@@ -536,7 +595,7 @@ export function InvoiceForm() {
             <SummaryRow label="Subtotal"              value={`Rp ${formatCurrency(subtotal)}`} />
             <SummaryRow label="Discount"              value={`– Rp ${formatCurrency(data.discount)}`} />
             <SummaryRow label={`Tax (${data.taxRate}%)`} value={`Rp ${formatCurrency(taxAmt)}`} />
-            <div className="flex justify-between items-center px-5 py-3.5" style={{ backgroundColor: '#1A3A5C' }}>
+            <div className="flex justify-between items-center px-5 py-3.5" style={{ backgroundColor: data.primaryColor }}>
               <span className="font-bold text-white text-sm" style={{ fontFamily: fontCss }}>Total Invoice</span>
               <span className="font-bold text-white text-lg" style={{ fontFamily: fontCss }}>Rp {formatCurrency(total)}</span>
             </div>
@@ -551,7 +610,7 @@ export function InvoiceForm() {
           onClick={handleGenerate}
           disabled={loading}
           className="w-full py-4 rounded-xl text-white font-bold text-base transition-all hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-          style={{ backgroundColor: '#1A3A5C', fontFamily: fontCss }}
+          style={{ backgroundColor: data.primaryColor, fontFamily: fontCss }}
         >
           <Download size={18} />
           {loading ? 'Generating PDF…' : 'Generate & Download PDF'}
@@ -567,11 +626,11 @@ export function InvoiceForm() {
 
 // ── Reusable primitives ────────────────────────────────────────────────────────
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({ title, color, children }: { title: string; color: string; children: React.ReactNode }) {
   return (
     <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
       <div className="px-5 py-3 border-b border-slate-100 bg-slate-50">
-        <h2 className="text-xs font-bold tracking-widest uppercase" style={{ color: '#1A3A5C' }}>{title}</h2>
+        <h2 className="text-xs font-bold tracking-widest uppercase" style={{ color }}>{title}</h2>
       </div>
       <div className="px-5 py-4">{children}</div>
     </div>

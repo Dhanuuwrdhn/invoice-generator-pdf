@@ -38,7 +38,6 @@ Font.register({
 });
 
 // Colors
-const NAVY    = '#1A3A5C';
 const G555    = '#555555';
 const G777    = '#777777';
 const G666    = '#666666';
@@ -53,26 +52,26 @@ const G333    = '#333333';
 
 const CW = 493;
 
-function buildStyles(f: FontChoice) {
+function buildStyles(f: FontChoice, primary: string) {
   const B = { fontFamily: f, fontWeight: 'bold' } as const;
   return {
     page:       { fontFamily: f, paddingLeft: 51, paddingRight: 51, paddingTop: 45, paddingBottom: 45, fontSize: 9, color: BLACK, backgroundColor: WHITE },
     // header
-    headerRow:  { flexDirection: 'row' as const, borderBottomWidth: 2.5, borderBottomColor: NAVY, paddingBottom: 8, marginBottom: 10 },
+    headerRow:  { flexDirection: 'row' as const, borderBottomWidth: 2.5, borderBottomColor: primary, paddingBottom: 8, marginBottom: 10 },
     hLeft:      { width: CW * 0.55 },
     hRight:     { width: CW * 0.45, alignItems: 'flex-end' as const },
-    senderName: { ...B, fontSize: 14, color: NAVY, marginBottom: 3 },
+    senderName: { ...B, fontSize: 14, color: primary, marginBottom: 3 },
     senderTitle:{ fontFamily: f, fontSize: 9, color: G555, marginBottom: 2 },
     senderCtc:  { fontFamily: f, fontSize: 8, color: G777, marginBottom: 1 },
-    invTitle:   { ...B, fontSize: 18, color: NAVY, marginBottom: 4 },
+    invTitle:   { ...B, fontSize: 18, color: primary, marginBottom: 4 },
     invNo:      { fontFamily: f, fontSize: 9, color: G555, marginBottom: 5 },
     badge:      { backgroundColor: BADGEBG, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 3 },
     badgeText:  { ...B, fontSize: 8, color: BADGEFG },
     // bill + meta
     billMetaRow:{ flexDirection: 'row' as const, marginBottom: 12 },
-    billBlock:  { width: CW * 0.52 },
+    billBlock:  { width: CW * 0.52, paddingRight: 20 },
     metaBlock:  { width: CW * 0.48 },
-    blockLabel: { ...B, fontSize: 8, color: NAVY, borderBottomWidth: 0.8, borderBottomColor: NAVY, paddingBottom: 5, marginBottom: 5 },
+    blockLabel: { ...B, fontSize: 8, color: primary, borderBottomWidth: 0.8, borderBottomColor: primary, paddingBottom: 5, marginBottom: 5 },
     clientCo:   { ...B, fontSize: 10, color: BLACK, marginBottom: 2 },
     clientDtl:  { fontFamily: f, fontSize: 9, color: G555, marginBottom: 2, lineHeight: 1.4 },
     metaRow:    { flexDirection: 'row' as const, marginBottom: 3 },
@@ -80,7 +79,7 @@ function buildStyles(f: FontChoice) {
     metaColon:  { fontFamily: f, fontSize: 9, color: G777, width: 10 },
     metaVal:    { ...B, fontSize: 9, color: BLACK, flex: 1, textAlign: 'right' as const },
     // table
-    tHdr:       { flexDirection: 'row' as const, backgroundColor: NAVY, paddingTop: 8, paddingBottom: 8, paddingLeft: 6, paddingRight: 6 },
+    tHdr:       { flexDirection: 'row' as const, backgroundColor: primary, paddingTop: 8, paddingBottom: 8, paddingLeft: 6, paddingRight: 6 },
     tRow:       { flexDirection: 'row' as const, paddingTop: 8, paddingBottom: 8, paddingLeft: 6, paddingRight: 6, borderBottomWidth: 0.5, borderBottomColor: MGRAY },
     colNo:      { width: CW * 0.05 },
     colDesc:    { width: CW * 0.50 },
@@ -97,11 +96,11 @@ function buildStyles(f: FontChoice) {
     tdGC:       { fontFamily: f, fontSize: 9, color: G777, textAlign: 'center' as const },
     tdR:        { fontFamily: f, fontSize: 9, color: BLACK, textAlign: 'right' as const },
     // terbilang
-    terbBox:    { backgroundColor: LBLUE, borderLeftWidth: 3.5, borderLeftColor: NAVY, paddingLeft: 12, paddingRight: 12, paddingTop: 8, paddingBottom: 8, marginTop: 10, marginBottom: 10 },
+    terbBox:    { backgroundColor: LBLUE, borderLeftWidth: 3.5, borderLeftColor: primary, paddingLeft: 12, paddingRight: 12, paddingTop: 8, paddingBottom: 8, marginTop: 10, marginBottom: 10 },
     terbTxt:    { fontFamily: f, fontSize: 9, color: G333 },
     // totals
     totRow:     { flexDirection: 'row' as const, paddingVertical: 5, paddingHorizontal: 10, borderBottomWidth: 0.5, borderBottomColor: MGRAY },
-    totFinal:   { flexDirection: 'row' as const, paddingVertical: 5, paddingHorizontal: 10, backgroundColor: NAVY },
+    totFinal:   { flexDirection: 'row' as const, paddingVertical: 5, paddingHorizontal: 10, backgroundColor: primary },
     totLbl:     { fontFamily: f, flex: 0.7, fontSize: 9, color: G555 },
     totVal:     { ...B, flex: 0.3, fontSize: 9, color: BLACK, textAlign: 'right' as const },
     totFLbl:    { ...B, flex: 0.7, fontSize: 11, color: WHITE },
@@ -110,7 +109,7 @@ function buildStyles(f: FontChoice) {
     paySigRow:  { flexDirection: 'row' as const, marginTop: 16, marginBottom: 14 },
     payBlock:   { width: CW * 0.6 },
     sigBlock:   { width: CW * 0.4, alignItems: 'center' as const },
-    payBLabel:  { ...B, fontSize: 8, color: NAVY, borderBottomWidth: 0.8, borderBottomColor: NAVY, paddingBottom: 5, marginBottom: 6 },
+    payBLabel:  { ...B, fontSize: 8, color: primary, borderBottomWidth: 0.8, borderBottomColor: primary, paddingBottom: 5, marginBottom: 6 },
     payIntro:   { fontFamily: f, fontSize: 9, color: G555, marginBottom: 6 },
     payRow:     { flexDirection: 'row' as const, marginBottom: 3 },
     payLbl:     { fontFamily: f, fontSize: 9, color: G777, width: 82 },
@@ -130,7 +129,7 @@ function buildStyles(f: FontChoice) {
 function itemAmt(item: InvoiceItem) { return item.qty * item.price; }
 
 export function InvoicePDF({ data }: { data: InvoiceData }) {
-  const s = buildStyles(data.fontFamily || 'Caladea');
+  const s = buildStyles(data.fontFamily || 'Caladea', data.primaryColor || '#1A3A5C');
   const subtotal = calcSubtotal(data.items);
   const taxAmt   = calcTax(subtotal, data.discount, data.taxRate);
   const total    = calcTotal(subtotal, data.discount, taxAmt);

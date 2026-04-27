@@ -12,6 +12,7 @@ export type FontChoice = 'Caladea' | 'Lato' | 'Montserrat';
 
 export interface InvoiceData {
   fontFamily: FontChoice;
+  primaryColor: string;
   // Sender
   senderName: string;
   senderTitle: string;
