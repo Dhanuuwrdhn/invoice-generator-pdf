@@ -8,7 +8,10 @@ export interface InvoiceItem {
   price: number;
 }
 
+export type FontChoice = 'Caladea' | 'Lato' | 'Montserrat';
+
 export interface InvoiceData {
+  fontFamily: FontChoice;
   // Sender
   senderName: string;
   senderTitle: string;

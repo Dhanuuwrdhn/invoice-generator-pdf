@@ -1,142 +1,177 @@
 import Link from 'next/link';
-import {
-  FileText,
-  Zap,
-  Layout,
-  ClipboardList,
-  Hash,
-  Calculator,
-  ArrowRight,
-} from 'lucide-react';
+import { ArrowRight, FileText, Zap, Layout, Hash, Calculator, ClipboardList } from 'lucide-react';
 
 const FEATURES = [
-  {
-    icon: ClipboardList,
-    title: 'Form Lengkap',
-    desc: 'Isi semua detail invoice: pengirim, klien, item layanan, dan informasi pembayaran.',
-  },
-  {
-    icon: Zap,
-    title: 'Generate Instan',
-    desc: 'PDF profesional siap didownload dalam hitungan detik langsung dari browser.',
-  },
-  {
-    icon: Layout,
-    title: 'Desain Profesional',
-    desc: 'Layout bersih dengan header navy, tabel item, terbilang, dan blok tanda tangan.',
-  },
-  {
-    icon: FileText,
-    title: 'Data Template',
-    desc: 'Gunakan data template bawaan sebagai contoh, lalu sesuaikan dengan kebutuhan Anda.',
-  },
-  {
-    icon: Hash,
-    title: 'Terbilang Otomatis',
-    desc: 'Total tagihan otomatis dikonversi ke teks Bahasa Indonesia.',
-  },
-  {
-    icon: Calculator,
-    title: 'Kalkulasi Otomatis',
-    desc: 'Subtotal, diskon, pajak, dan total dihitung secara otomatis saat mengisi form.',
-  },
+  { icon: ClipboardList, title: 'Complete Form',       desc: 'Fill in every detail — sender, client, line items, and payment info.' },
+  { icon: Zap,           title: 'Instant Generation',  desc: 'Professional PDF ready to download in seconds, straight from the browser.' },
+  { icon: Layout,        title: 'Clean Design',        desc: 'Navy header, item table, terbilang box, and signature block included.' },
+  { icon: FileText,      title: 'Multiple Templates',  desc: 'Load a built-in template or save your own for repeated use.' },
+  { icon: Hash,          title: 'Auto Terbilang',      desc: 'Total amount is automatically converted to Indonesian words.' },
+  { icon: Calculator,    title: 'Live Calculation',    desc: 'Subtotal, discount, tax and grand total update as you type.' },
 ];
 
 export default function LandingPage() {
   return (
     <div
-      className="min-h-screen flex flex-col"
-      style={{ fontFamily: "'Caladea', 'Cambria', Georgia, serif" }}
+      className="min-h-screen flex flex-col overflow-x-hidden"
+      style={{ fontFamily: "'Caladea', 'Cambria', Georgia, serif", backgroundColor: '#0D1B2A' }}
     >
-      {/* Navbar */}
-      <nav className="w-full px-6 py-4 flex items-center justify-between border-b border-slate-100 bg-white">
-        <span className="font-bold text-lg" style={{ color: '#1A3A5C' }}>
-          InvoicePDF
-        </span>
+
+      {/* ── Background mesh ── */}
+      <div className="fixed inset-0 z-0 pointer-events-none" aria-hidden>
+        <div className="absolute -top-32 -left-32 w-[600px] h-[600px] rounded-full opacity-20"
+          style={{ background: 'radial-gradient(circle, #2A6496 0%, transparent 70%)' }} />
+        <div className="absolute top-1/2 -right-48 w-[500px] h-[500px] rounded-full opacity-15"
+          style={{ background: 'radial-gradient(circle, #1A6B3C 0%, transparent 70%)' }} />
+        <div className="absolute bottom-0 left-1/3 w-[400px] h-[400px] rounded-full opacity-10"
+          style={{ background: 'radial-gradient(circle, #5B2D8E 0%, transparent 70%)' }} />
+      </div>
+
+      {/* ── Navbar ── */}
+      <nav className="relative z-10 w-full px-6 py-4 flex items-center justify-between"
+        style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', backdropFilter: 'blur(12px)', backgroundColor: 'rgba(13,27,42,0.6)' }}>
+        <span className="font-bold text-lg text-white tracking-tight">InvoicePDF</span>
         <Link
           href="/generator"
-          className="text-sm font-semibold px-4 py-2 rounded-full transition-all hover:opacity-80"
-          style={{ backgroundColor: '#1A3A5C', color: '#fff' }}
+          className="flex items-center gap-2 text-sm font-semibold px-5 py-2 rounded-full transition-all hover:opacity-90"
+          style={{ background: 'linear-gradient(135deg, #1A6B3C, #2A6496)', color: '#fff' }}
         >
-          Buat Invoice
+          Create Invoice <ArrowRight size={14} />
         </Link>
       </nav>
 
-      {/* Hero */}
-      <section className="flex-1 flex flex-col items-center justify-center text-center px-6 py-24 bg-white">
-        <span
-          className="inline-block text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-6"
-          style={{ backgroundColor: '#E8F4E8', color: '#2E7D32' }}
-        >
-          Gratis · Tanpa Login
-        </span>
-        <h1
-          className="text-4xl sm:text-5xl md:text-6xl font-bold leading-tight mb-6 max-w-3xl"
-          style={{ color: '#1A3A5C' }}
-        >
-          Buat Invoice PDF{' '}
-          <span style={{ color: '#2E7D32' }}>Profesional</span>{' '}
-          dalam Hitungan Detik
+      {/* ── Hero ── */}
+      <section className="relative z-10 flex-1 flex flex-col items-center justify-center text-center px-6 py-28">
+
+        {/* Badge */}
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold mb-8 border"
+          style={{ backgroundColor: 'rgba(26,107,60,0.15)', borderColor: 'rgba(26,107,60,0.3)', color: '#4ADE80' }}>
+          Free · No Sign-up · Instant Download
+        </div>
+
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white leading-tight max-w-3xl mb-6">
+          Create{' '}
+          <span style={{
+            background: 'linear-gradient(135deg, #60A5FA, #34D399)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+          }}>
+            Professional
+          </span>
+          {' '}PDF Invoices in Seconds
         </h1>
-        <p className="text-slate-500 text-lg max-w-xl mb-10 leading-relaxed">
-          Isi form, klik tombol, dan invoice PDF siap didownload — lengkap dengan
-          terbilang, tabel item, dan blok tanda tangan.
+
+        <p className="text-base sm:text-lg max-w-xl mb-10 leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)' }}>
+          Fill the form, pick your font, and download a polished invoice PDF —
+          complete with auto terbilang, itemised table, and signature block.
         </p>
+
         <div className="flex flex-col sm:flex-row gap-3 items-center">
           <Link
             href="/generator"
-            className="flex items-center gap-2 px-8 py-4 rounded-full text-white font-bold text-base transition-all hover:opacity-90 hover:shadow-lg"
-            style={{ backgroundColor: '#1A3A5C' }}
+            className="flex items-center gap-2 px-8 py-4 rounded-full font-bold text-base text-white transition-all hover:opacity-90 hover:shadow-xl hover:-translate-y-0.5"
+            style={{ background: 'linear-gradient(135deg, #1A3A5C, #2A6496)', boxShadow: '0 0 30px rgba(42,100,150,0.4)' }}
           >
-            Mulai Buat Invoice
-            <ArrowRight size={16} />
+            Start Building <ArrowRight size={16} />
           </Link>
           <a
-            href="#fitur"
-            className="px-8 py-4 rounded-full font-semibold text-sm border-2 transition-all hover:bg-slate-50"
-            style={{ borderColor: '#1A3A5C', color: '#1A3A5C' }}
+            href="#features"
+            className="px-8 py-4 rounded-full font-semibold text-sm border transition-all hover:bg-white/5"
+            style={{ borderColor: 'rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.6)' }}
           >
-            Lihat Fitur
+            See Features
           </a>
         </div>
 
-        <div className="mt-16 flex items-center gap-3 text-slate-400 text-sm">
-          <span className="h-px w-12 bg-slate-200" />
-          Format A4 · Font Caladea · Layout Profesional
-          <span className="h-px w-12 bg-slate-200" />
+        {/* Floating glass preview card */}
+        <div className="mt-20 w-full max-w-2xl rounded-2xl p-6 text-left"
+          style={{
+            background: 'rgba(255,255,255,0.04)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            boxShadow: '0 25px 50px rgba(0,0,0,0.4)',
+          }}>
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-3 h-3 rounded-full bg-red-500 opacity-80" />
+            <div className="w-3 h-3 rounded-full bg-yellow-500 opacity-80" />
+            <div className="w-3 h-3 rounded-full bg-green-500 opacity-80" />
+            <span className="ml-2 text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>invoice-generator-pdf.vercel.app/generator</span>
+          </div>
+          <div className="space-y-3">
+            {/* Mock invoice header */}
+            <div className="flex justify-between items-start pb-3"
+              style={{ borderBottom: '2px solid rgba(42,100,150,0.5)' }}>
+              <div>
+                <div className="w-32 h-3 rounded mb-1.5" style={{ backgroundColor: 'rgba(42,100,150,0.6)' }} />
+                <div className="w-24 h-2 rounded mb-1" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }} />
+                <div className="w-20 h-2 rounded" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }} />
+              </div>
+              <div className="text-right">
+                <div className="w-20 h-5 rounded mb-1.5" style={{ backgroundColor: 'rgba(42,100,150,0.6)' }} />
+                <div className="w-28 h-2 rounded mb-1" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }} />
+                <div className="w-20 h-5 rounded ml-auto flex items-center justify-center"
+                  style={{ backgroundColor: 'rgba(26,107,60,0.3)', border: '1px solid rgba(74,222,128,0.3)' }}>
+                  <div className="w-12 h-1.5 rounded" style={{ backgroundColor: 'rgba(74,222,128,0.6)' }} />
+                </div>
+              </div>
+            </div>
+            {/* Mock table */}
+            <div className="rounded overflow-hidden">
+              <div className="flex gap-2 px-3 py-2 rounded" style={{ backgroundColor: 'rgba(42,100,150,0.4)' }}>
+                {[5, 40, 10, 15, 15, 15].map((w, i) => (
+                  <div key={i} className="h-2 rounded" style={{ width: `${w}%`, backgroundColor: 'rgba(255,255,255,0.4)' }} />
+                ))}
+              </div>
+              {[1, 2].map(r => (
+                <div key={r} className="flex gap-2 px-3 py-2.5" style={{ backgroundColor: r % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.02)' }}>
+                  {[5, 40, 10, 15, 15, 15].map((w, i) => (
+                    <div key={i} className="h-2 rounded" style={{ width: `${w}%`, backgroundColor: 'rgba(255,255,255,0.1)' }} />
+                  ))}
+                </div>
+              ))}
+            </div>
+            {/* Mock total */}
+            <div className="flex justify-end">
+              <div className="w-48 rounded overflow-hidden">
+                <div className="flex justify-between px-3 py-1.5">
+                  <div className="w-12 h-2 rounded" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }} />
+                  <div className="w-16 h-2 rounded" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }} />
+                </div>
+                <div className="flex justify-between px-3 py-2 rounded" style={{ backgroundColor: 'rgba(42,100,150,0.5)' }}>
+                  <div className="w-14 h-2.5 rounded" style={{ backgroundColor: 'rgba(255,255,255,0.5)' }} />
+                  <div className="w-20 h-2.5 rounded" style={{ backgroundColor: 'rgba(255,255,255,0.5)' }} />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Features */}
-      <section id="fitur" className="py-20 px-6" style={{ backgroundColor: '#F7F9FC' }}>
+      {/* ── Features ── */}
+      <section id="features" className="relative z-10 py-24 px-6">
         <div className="max-w-4xl mx-auto">
-          <h2
-            className="text-2xl sm:text-3xl font-bold text-center mb-2"
-            style={{ color: '#1A3A5C' }}
-          >
-            Semua yang Kamu Butuhkan
+          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-2 text-white">
+            Everything You Need
           </h2>
-          <p className="text-center text-slate-500 mb-12 text-sm">
-            Dirancang untuk freelancer dan konsultan independen
+          <p className="text-center mb-14 text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            Built for freelancers and independent consultants
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {FEATURES.map((f) => {
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {FEATURES.map(f => {
               const Icon = f.icon;
               return (
-                <div
-                  key={f.title}
-                  className="bg-white rounded-xl p-6 border border-slate-100 hover:shadow-md transition-shadow"
-                >
-                  <div
-                    className="w-9 h-9 rounded-lg flex items-center justify-center mb-4"
-                    style={{ backgroundColor: '#F0F4F8' }}
-                  >
-                    <Icon size={18} style={{ color: '#1A3A5C' }} />
+                <div key={f.title} className="rounded-2xl p-5 transition-all hover:-translate-y-1"
+                  style={{
+                    background: 'rgba(255,255,255,0.04)',
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                  }}>
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center mb-4"
+                    style={{ background: 'rgba(42,100,150,0.25)', border: '1px solid rgba(42,100,150,0.3)' }}>
+                    <Icon size={17} style={{ color: '#60A5FA' }} />
                   </div>
-                  <h3 className="font-bold text-sm mb-1" style={{ color: '#1A3A5C' }}>
-                    {f.title}
-                  </h3>
-                  <p className="text-slate-500 text-sm leading-relaxed">{f.desc}</p>
+                  <h3 className="font-bold text-sm mb-1 text-white">{f.title}</h3>
+                  <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>{f.desc}</p>
                 </div>
               );
             })}
@@ -144,28 +179,36 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* CTA Bottom */}
-      <section className="py-20 px-6 text-center" style={{ backgroundColor: '#1A3A5C' }}>
-        <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
-          Siap membuat invoice pertamamu?
-        </h2>
-        <p className="text-slate-300 mb-8 text-sm">
-          Tidak perlu daftar. Tidak perlu bayar. Langsung pakai.
-        </p>
-        <Link
-          href="/generator"
-          className="inline-flex items-center gap-2 px-10 py-4 rounded-full font-bold text-base transition-all hover:opacity-90"
-          style={{ backgroundColor: '#ffffff', color: '#1A3A5C' }}
-        >
-          Buat Invoice Sekarang
-          <ArrowRight size={16} />
-        </Link>
+      {/* ── CTA ── */}
+      <section className="relative z-10 py-24 px-6 text-center">
+        <div className="max-w-2xl mx-auto rounded-3xl p-12"
+          style={{
+            background: 'rgba(255,255,255,0.04)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255,255,255,0.1)',
+          }}>
+          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
+            Ready to create your first invoice?
+          </h2>
+          <p className="mb-8 text-sm" style={{ color: 'rgba(255,255,255,0.45)' }}>
+            No registration. No payment. Just open, fill, and download.
+          </p>
+          <Link
+            href="/generator"
+            className="inline-flex items-center gap-2 px-10 py-4 rounded-full font-bold text-base text-white transition-all hover:opacity-90"
+            style={{ background: 'linear-gradient(135deg, #1A3A5C, #2A6496)', boxShadow: '0 0 30px rgba(42,100,150,0.35)' }}
+          >
+            Create Invoice Now <ArrowRight size={16} />
+          </Link>
+        </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-6 text-center text-xs text-slate-400 border-t border-slate-100 bg-white">
+      {/* ── Footer ── */}
+      <footer className="relative z-10 py-6 text-center text-xs border-t"
+        style={{ borderColor: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.25)' }}>
         InvoicePDF · 2026
       </footer>
+
     </div>
   );
 }
