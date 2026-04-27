@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { ElegantTemplate } from '@/components/invitation/ElegantTemplate';
+import { TemplateRenderer } from '@/components/invitation/TemplateRenderer';
 import { Invitation } from '@/types/invitation';
 import type { Metadata } from 'next';
 
@@ -30,5 +30,5 @@ export default async function InvitationPage({ params }: Props) {
   const { slug } = await params;
   const inv = await getInvitation(slug);
   if (!inv) notFound();
-  return <ElegantTemplate inv={inv} />;
+  return <TemplateRenderer inv={inv} />;
 }

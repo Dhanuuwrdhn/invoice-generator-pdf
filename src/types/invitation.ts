@@ -24,6 +24,7 @@ export interface Invitation {
   closing_message: string;
 
   // Appearance
+  template_id: string;
   primary_color: string;
   cover_image_url: string;
   music_url: string;

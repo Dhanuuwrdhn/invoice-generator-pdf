@@ -18,7 +18,29 @@ const BUILTIN_MUSIC = [
   { label: 'Beautiful In White', value: '/music/Beautiful In White.mp3' },
 ];
 
+const TEMPLATES = [
+  {
+    id: 'elegant',
+    name: 'Elegant',
+    desc: 'Clean, foto hero, serif',
+    preview: { bg: '#1A3A5C', text: '#fff' },
+  },
+  {
+    id: 'floral',
+    name: 'Floral',
+    desc: 'Romantis, ornamen bunga',
+    preview: { bg: '#FFF5F7', text: '#9F1239' },
+  },
+  {
+    id: 'modern',
+    name: 'Modern',
+    desc: 'Bold, dark, geometric',
+    preview: { bg: '#0D1117', text: '#fff' },
+  },
+];
+
 interface FormData {
+  template_id: string;
   bride_name: string;
   groom_name: string;
   bride_parents: string;
@@ -40,6 +62,7 @@ interface FormData {
 
 function empty(): FormData {
   return {
+    template_id: 'elegant',
     bride_name: '', groom_name: '', bride_parents: '', groom_parents: '',
     akad_date: '', akad_time: '', akad_venue: '', akad_address: '',
     reception_date: '', reception_time: '', reception_venue: '', reception_address: '',
@@ -184,6 +207,35 @@ export default function NewInvitationPage() {
       </div>
 
       <div className="max-w-3xl mx-auto px-4 py-6 space-y-5">
+
+        {/* Template picker */}
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm px-5 py-4">
+          <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-3">Pilih Template</p>
+          <div className="grid grid-cols-3 gap-3">
+            {TEMPLATES.map(t => {
+              const active = form.template_id === t.id;
+              return (
+                <button
+                  key={t.id}
+                  onClick={() => set('template_id', t.id)}
+                  className="rounded-xl overflow-hidden border-2 transition-all text-left"
+                  style={{ borderColor: active ? P : '#e2e8f0', boxShadow: active ? `0 0 0 2px ${P}33` : undefined }}
+                >
+                  {/* Mini preview */}
+                  <div className="h-16 flex flex-col items-center justify-center gap-1" style={{ backgroundColor: t.preview.bg }}>
+                    <div className="w-10 h-1.5 rounded-full opacity-80" style={{ backgroundColor: t.preview.text }} />
+                    <div className="text-xs font-bold" style={{ color: t.preview.text }}>&</div>
+                    <div className="w-10 h-1.5 rounded-full opacity-80" style={{ backgroundColor: t.preview.text }} />
+                  </div>
+                  <div className="px-3 py-2" style={{ backgroundColor: active ? `${P}08` : '#f8fafc' }}>
+                    <p className="text-xs font-bold" style={{ color: active ? P : '#374151' }}>{t.name}</p>
+                    <p className="text-xs text-slate-400">{t.desc}</p>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
         {/* Color picker */}
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm px-5 py-4">
