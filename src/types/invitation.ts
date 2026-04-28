@@ -27,6 +27,10 @@ export interface Invitation {
   template_id: string;
   primary_color: string;
   cover_image_url: string;
+  couple_image_url: string;
+  photo_2_url: string;
+  photo_3_url: string;
+  love_story_text: string;
   music_url: string;
 
   // Gift / payment (optional)
