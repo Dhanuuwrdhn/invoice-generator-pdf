@@ -178,7 +178,7 @@ function JawaSplash({ inv, color, onOpen }: { inv: Invitation; color: string; on
             letterSpacing: '0.2em',
           }}
         >
-          {leaving ? 'Mbukak…' : 'Mbukak Undangan'}
+          {leaving ? 'Membuka…' : 'Buka Undangan'}
         </button>
       </div>
 
