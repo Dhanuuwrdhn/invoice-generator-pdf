@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Plus, Loader2, Copy, Check } from 'lucide-react';
+import { ArrowLeft, Plus, Loader2, Copy, Check, Upload, X } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 const COLOR_PRESETS = [
   { label: 'Navy',     value: '#1A3A5C' },
@@ -116,6 +117,78 @@ function Section({ title, color, children }: { title: string; color: string; chi
         <h2 className="text-xs font-bold tracking-widest uppercase" style={{ color }}>{title}</h2>
       </div>
       <div className="px-5 py-4">{children}</div>
+    </div>
+  );
+}
+
+function PhotoUpload({ value, onChange, placeholder, aspectClass = 'h-24' }: {
+  value: string;
+  onChange: (url: string) => void;
+  placeholder?: string;
+  aspectClass?: string;
+}) {
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState('');
+
+  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setUploadError('');
+    try {
+      const ext = file.name.split('.').pop() ?? 'jpg';
+      const path = `photos/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const { data, error } = await supabase.storage
+        .from('invitation-photos')
+        .upload(path, file, { upsert: false });
+      if (error) throw error;
+      const { data: { publicUrl } } = supabase.storage
+        .from('invitation-photos')
+        .getPublicUrl(data.path);
+      onChange(publicUrl);
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : 'Upload gagal');
+    } finally {
+      setUploading(false);
+      e.target.value = '';
+    }
+  }
+
+  return (
+    <div className="space-y-2">
+      <div className="flex gap-2">
+        <input
+          type="text"
+          value={value}
+          onChange={e => onChange(e.target.value)}
+          placeholder={placeholder ?? 'https://... atau upload foto di bawah'}
+          className="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+        />
+        <label className="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-200 text-sm text-slate-600 bg-white cursor-pointer hover:bg-slate-50 transition-colors">
+          {uploading ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
+          <span className="hidden sm:inline">{uploading ? 'Uploading…' : 'Upload'}</span>
+          <input type="file" accept="image/*" className="hidden" onChange={handleFile} disabled={uploading} />
+        </label>
+      </div>
+      {uploadError && <p className="text-xs text-red-500">{uploadError}</p>}
+      {value && (
+        <div className="relative inline-block">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={value}
+            alt="preview"
+            className={`${aspectClass} w-full object-cover rounded-lg border border-slate-200`}
+            onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }}
+          />
+          <button
+            type="button"
+            onClick={() => onChange('')}
+            className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/50 flex items-center justify-center hover:bg-black/70 transition-colors"
+          >
+            <X size={10} className="text-white" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -356,8 +429,8 @@ export default function NewInvitationPage() {
                 className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
               />
             </Field>
-            <Field label="URL Foto Cover (opsional)" full>
-              <Input value={form.cover_image_url} onChange={v => set('cover_image_url', v)} placeholder="https://... (URL foto)" />
+            <Field label="Foto Cover (opsional)" full>
+              <PhotoUpload value={form.cover_image_url} onChange={v => set('cover_image_url', v)} />
             </Field>
           </div>
         </Section>
@@ -367,32 +440,14 @@ export default function NewInvitationPage() {
           <p className="text-xs text-slate-400 mb-4">Tambahkan foto pasangan dan cerita cinta untuk membuat undangan lebih personal dan romantis.</p>
           <div className="space-y-4">
             <Field label="Foto Pasangan (Ken Burns section)" full>
-              <Input value={form.couple_image_url} onChange={v => set('couple_image_url', v)} placeholder="https://... (URL foto berdua)" />
-              {form.couple_image_url && (
-                <div className="mt-2">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={form.couple_image_url} alt="preview" className="h-24 w-full object-cover rounded-lg border border-slate-200" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                </div>
-              )}
+              <PhotoUpload value={form.couple_image_url} onChange={v => set('couple_image_url', v)} placeholder="https://... atau upload foto berdua" />
             </Field>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field label="Foto Love Story — Background">
-                <Input value={form.photo_2_url} onChange={v => set('photo_2_url', v)} placeholder="https://... (foto latar)" />
-                {form.photo_2_url && (
-                  <div className="mt-2">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={form.photo_2_url} alt="preview" className="h-20 w-full object-cover rounded-lg border border-slate-200" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                  </div>
-                )}
+                <PhotoUpload value={form.photo_2_url} onChange={v => set('photo_2_url', v)} placeholder="https://... atau upload" aspectClass="h-20" />
               </Field>
               <Field label="Foto Love Story — Portrait">
-                <Input value={form.photo_3_url} onChange={v => set('photo_3_url', v)} placeholder="https://... (foto portrait)" />
-                {form.photo_3_url && (
-                  <div className="mt-2">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={form.photo_3_url} alt="preview" className="h-20 w-full object-cover rounded-lg border border-slate-200" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                  </div>
-                )}
+                <PhotoUpload value={form.photo_3_url} onChange={v => set('photo_3_url', v)} placeholder="https://... atau upload" aspectClass="h-20" />
               </Field>
             </div>
             <Field label="Cerita Cinta" full>
@@ -453,17 +508,10 @@ export default function NewInvitationPage() {
             <Field label="Atas Nama">
               <Input value={form.bank_account_name} onChange={v => set('bank_account_name', v)} placeholder="Nama pemilik rekening" />
             </Field>
-            <Field label="URL Gambar QRIS">
-              <Input value={form.qris_image_url} onChange={v => set('qris_image_url', v)} placeholder="https://... (URL gambar QRIS)" />
+            <Field label="Gambar QRIS">
+              <PhotoUpload value={form.qris_image_url} onChange={v => set('qris_image_url', v)} placeholder="https://... atau upload QRIS" aspectClass="h-28 w-28 object-contain" />
             </Field>
           </div>
-          {form.qris_image_url && (
-            <div className="mt-4 flex items-center gap-3">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={form.qris_image_url} alt="QRIS preview" className="w-20 h-20 object-contain rounded-lg border border-slate-200" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-              <p className="text-xs text-slate-400">Preview QRIS</p>
-            </div>
-          )}
         </Section>
 
         {error && (
