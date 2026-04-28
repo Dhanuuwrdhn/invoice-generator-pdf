@@ -37,6 +37,12 @@ const TEMPLATES = [
     desc: 'Bold, dark, geometric',
     preview: { bg: '#0D1117', text: '#fff' },
   },
+  {
+    id: 'jawa',
+    name: 'Jawa',
+    desc: 'Batik, gold, tradisional',
+    preview: { bg: '#1C0A00', text: '#C9A96E' },
+  },
 ];
 
 interface FormData {
@@ -211,7 +217,7 @@ export default function NewInvitationPage() {
         {/* Template picker */}
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm px-5 py-4">
           <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-3">Pilih Template</p>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {TEMPLATES.map(t => {
               const active = form.template_id === t.id;
               return (

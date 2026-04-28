@@ -1,146 +1,202 @@
 'use client';
 
-import { useRef, useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Invitation } from '@/types/invitation';
+import { MusicPlayer, Reveal } from './shared';
 
-function MusicPlayer({ url, color }: { url: string; color: string }) {
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const [playing, setPlaying] = useState(false);
-  useEffect(() => { if (audioRef.current) { audioRef.current.loop = true; audioRef.current.volume = 0.5; } }, []);
-  function toggle() {
-    const a = audioRef.current; if (!a) return;
-    if (playing) { a.pause(); setPlaying(false); } else { a.play().then(() => setPlaying(true)); }
+/* ── Modern splash — full dark, animated lines ── */
+function ModernSplash({ inv, color, onOpen }: { inv: Invitation; color: string; onOpen: () => void }) {
+  const [leaving, setLeaving] = useState(false);
+  const [visible, setVisible] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setVisible(true), 80); return () => clearTimeout(t); }, []);
+
+  function handle() {
+    if (leaving) return;
+    setLeaving(true);
+    setTimeout(onOpen, 800);
   }
+
   return (
-    <>
-      <audio ref={audioRef} src={url} preload="none" />
-      <button onClick={toggle} title={playing ? 'Pause' : 'Play'}
-        className="fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full shadow-lg flex items-center justify-center transition-transform hover:scale-110"
-        style={{ backgroundColor: color }}>
-        {playing ? (
-          <span className="flex items-end gap-0.5 h-5">
-            {[1,2,3].map(i=>(
-              <span key={i} className="w-1 rounded-full bg-white"
-                style={{ height:`${i===2?100:60}%`, animation:`mb${i} 0.8s ease-in-out infinite alternate`, animationDelay:`${(i-1)*0.15}s` }}/>
-            ))}
-          </span>
-        ) : (
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <path d="M9 18V5l12-2v13" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <circle cx="6" cy="18" r="3" fill="white"/><circle cx="18" cy="16" r="3" fill="white"/>
-          </svg>
+    <div
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center text-center px-8 overflow-hidden"
+      style={{
+        backgroundColor: '#0D1117',
+        opacity:   leaving ? 0 : 1,
+        transform: leaving ? 'translateY(-20px)' : 'translateY(0)',
+        transition: 'opacity 0.7s ease, transform 0.7s ease',
+        pointerEvents: leaving ? 'none' : 'auto',
+      }}
+    >
+      {/* Animated accent line left */}
+      <div className="absolute left-0 top-0 w-1 h-full" style={{ backgroundColor: color, opacity: 0.6 }} />
+
+      {/* Grid pattern background */}
+      <div className="absolute inset-0 opacity-5" style={{
+        backgroundImage: `linear-gradient(${color} 1px, transparent 1px), linear-gradient(90deg, ${color} 1px, transparent 1px)`,
+        backgroundSize: '40px 40px',
+      }} />
+
+      <div style={{ opacity: visible ? 1 : 0, transform: visible ? 'none' : 'translateY(20px)', transition: 'opacity 1s ease, transform 1s ease' }}>
+        <p className="text-xs tracking-[0.4em] uppercase mb-6 font-semibold" style={{ color }}>
+          Wedding Invitation
+        </p>
+        <h1 className="font-black leading-none mb-2" style={{ fontSize: 'clamp(2.8rem,10vw,6rem)', color: '#fff', letterSpacing: '-0.02em' }}>
+          {inv.groom_name}
+        </h1>
+        <div className="flex items-center gap-4 my-3">
+          <div className="h-px flex-1" style={{ backgroundColor: `${color}55` }} />
+          <span className="text-white/40 font-bold">&</span>
+          <div className="h-px flex-1" style={{ backgroundColor: `${color}55` }} />
+        </div>
+        <h1 className="font-black leading-none" style={{ fontSize: 'clamp(2.8rem,10vw,6rem)', color: '#fff', letterSpacing: '-0.02em' }}>
+          {inv.bride_name}
+        </h1>
+        {inv.reception_date && (
+          <p className="mt-6 text-sm tracking-widest uppercase" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            {inv.reception_date}
+          </p>
         )}
-      </button>
-      <style>{`@keyframes mb1{from{height:30%}to{height:90%}}@keyframes mb2{from{height:70%}to{height:30%}}@keyframes mb3{from{height:50%}to{height:100%}}`}</style>
-    </>
+
+        <button
+          onClick={handle}
+          className="mt-12 px-8 py-3 rounded-sm text-sm tracking-[0.25em] uppercase font-semibold transition-all hover:opacity-80"
+          style={{ backgroundColor: color, color: '#fff' }}
+        >
+          Buka Undangan
+        </button>
+      </div>
+    </div>
   );
 }
 
-export function ModernTemplate({ inv }: { inv: Invitation }) {
-  const P = inv.primary_color || '#1A3A5C';
+/* ── Main content ── */
+function InvitationContent({ inv, color }: { inv: Invitation; color: string }) {
+  const [visible, setVisible] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setVisible(true), 100); return () => clearTimeout(t); }, []);
 
   return (
-    <div className="min-h-screen w-full" style={{ fontFamily: "'Montserrat','Arial',sans-serif", backgroundColor: '#0D1117' }}>
-      {inv.music_url && <MusicPlayer url={inv.music_url} color={P} />}
+    <div style={{ opacity: visible ? 1 : 0, transform: visible ? 'none' : 'translateY(28px)', transition: 'opacity 0.9s ease, transform 0.9s ease' }}>
 
-      {/* ── Hero ── */}
-      <section className="relative min-h-screen flex flex-col justify-end px-8 pb-16 overflow-hidden"
-        style={{ background: inv.cover_image_url ? `linear-gradient(to top, rgba(13,17,23,0.95) 40%, rgba(13,17,23,0.2) 100%), url(${inv.cover_image_url}) center/cover` : `linear-gradient(160deg, #0D1117 60%, ${P}44 100%)` }}>
-
-        {/* Accent line top-left */}
-        <div className="absolute top-0 left-0 w-1 h-full opacity-60" style={{ backgroundColor: P }} />
-        <div className="absolute top-8 left-8 text-xs tracking-[0.4em] uppercase text-white/40 font-semibold">
-          Wedding Invitation
-        </div>
-
+      {/* Hero */}
+      <section
+        className="relative min-h-screen flex flex-col justify-end px-8 pb-16 overflow-hidden"
+        style={{
+          background: inv.cover_image_url
+            ? `linear-gradient(to top, rgba(13,17,23,0.95) 40%, rgba(13,17,23,0.2)), url(${inv.cover_image_url}) center/cover`
+            : `linear-gradient(160deg, #0D1117 60%, ${color}44 100%)`,
+        }}
+      >
+        <div className="absolute left-0 top-0 w-1 h-full opacity-60" style={{ backgroundColor: color }} />
+        <div className="absolute top-8 left-8 text-xs tracking-[0.4em] uppercase text-white/40 font-semibold">Wedding Invitation</div>
         <div className="relative z-10">
-          <p className="text-xs tracking-[0.35em] uppercase mb-4 font-semibold" style={{ color: P }}>
-            The Wedding of
-          </p>
+          <p className="text-xs tracking-[0.35em] uppercase mb-3 font-semibold" style={{ color }}>The Wedding of</p>
           <h1 className="font-black leading-none mb-1" style={{ fontSize: 'clamp(3rem,12vw,7rem)', color: '#fff', letterSpacing: '-0.02em' }}>
             {inv.groom_name}
           </h1>
           <div className="flex items-center gap-4 my-3">
-            <div className="h-px flex-1" style={{ backgroundColor: `${P}66` }} />
+            <div className="h-px flex-1" style={{ backgroundColor: `${color}55` }} />
             <span className="text-white/40 font-bold text-xl">&</span>
-            <div className="h-px flex-1" style={{ backgroundColor: `${P}66` }} />
+            <div className="h-px flex-1" style={{ backgroundColor: `${color}55` }} />
           </div>
           <h1 className="font-black leading-none" style={{ fontSize: 'clamp(3rem,12vw,7rem)', color: '#fff', letterSpacing: '-0.02em' }}>
             {inv.bride_name}
           </h1>
-
           {inv.reception_date && (
             <div className="flex items-center gap-3 mt-8">
-              <div className="w-8 h-px" style={{ backgroundColor: P }} />
+              <div className="w-8 h-px" style={{ backgroundColor: color }} />
               <p className="text-sm font-semibold text-white/60 tracking-widest uppercase">{inv.reception_date}</p>
             </div>
           )}
         </div>
       </section>
 
-      {/* ── Opening ── */}
+      {/* Opening */}
       <section className="py-20 px-8 max-w-2xl mx-auto text-center">
-        <div className="w-8 h-1 mx-auto mb-8 rounded-full" style={{ backgroundColor: P }} />
-        <p className="text-white/50 text-sm leading-relaxed italic">
-          {inv.opening_message || 'Dengan memohon rahmat dan ridha Allah SWT, kami mengundang kehadiran Bapak/Ibu/Saudara/i pada pernikahan putra-putri kami.'}
-        </p>
+        <Reveal>
+          <div className="w-8 h-1 mx-auto mb-8 rounded-full" style={{ backgroundColor: color }} />
+          <p className="text-white/50 text-sm leading-relaxed italic">
+            {inv.opening_message || 'Dengan memohon rahmat dan ridha Allah SWT, kami mengundang kehadiran Bapak/Ibu/Saudara/i pada pernikahan putra-putri kami.'}
+          </p>
+        </Reveal>
       </section>
 
-      {/* ── Couple ── */}
+      {/* Couple */}
       <section className="px-8 pb-20 max-w-2xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-4">
         {[
-          { name: inv.groom_name, parents: inv.groom_parents, label: 'Mempelai Pria' },
-          { name: inv.bride_name, parents: inv.bride_parents, label: 'Mempelai Wanita' },
+          { name: inv.groom_name, parents: inv.groom_parents, label: 'Mempelai Pria',   dir: 'left'  as const },
+          { name: inv.bride_name, parents: inv.bride_parents, label: 'Mempelai Wanita', dir: 'right' as const },
         ].map((p, i) => (
-          <div key={i} className="rounded-2xl p-6 border" style={{ backgroundColor: '#161B22', borderColor: `${P}33` }}>
-            <p className="text-xs font-bold tracking-[0.2em] uppercase mb-3" style={{ color: P }}>{p.label}</p>
-            <h3 className="font-black text-2xl text-white mb-2" style={{ letterSpacing: '-0.01em' }}>{p.name}</h3>
-            {p.parents && <p className="text-xs text-white/40 leading-relaxed">{p.parents}</p>}
-          </div>
+          <Reveal key={i} direction={p.dir} delay={i * 100}>
+            <div className="rounded-2xl p-6 border" style={{ backgroundColor: '#161B22', borderColor: `${color}33` }}>
+              <p className="text-xs font-bold tracking-[0.2em] uppercase mb-3" style={{ color }}>{p.label}</p>
+              <h3 className="font-black text-2xl text-white mb-2" style={{ letterSpacing: '-0.01em' }}>{p.name}</h3>
+              {p.parents && <p className="text-xs text-white/40 leading-relaxed">{p.parents}</p>}
+            </div>
+          </Reveal>
         ))}
       </section>
 
-      {/* ── Events ── */}
+      {/* Events */}
       <section className="py-20 px-8" style={{ backgroundColor: '#161B22' }}>
         <div className="max-w-2xl mx-auto">
-          <p className="text-xs font-bold tracking-[0.35em] uppercase mb-10" style={{ color: P }}>Rangkaian Acara</p>
+          <Reveal>
+            <p className="text-xs font-bold tracking-[0.35em] uppercase mb-10" style={{ color }}>Rangkaian Acara</p>
+          </Reveal>
           <div className="space-y-4">
             {inv.akad_date && (
-              <div className="flex gap-6 items-start rounded-xl p-6 border" style={{ backgroundColor: '#0D1117', borderColor: `${P}22` }}>
-                <div className="w-10 h-10 rounded-lg shrink-0 flex items-center justify-center font-black text-xs text-white" style={{ backgroundColor: P }}>01</div>
-                <div>
-                  <p className="font-bold text-white mb-1">Akad Nikah</p>
-                  <p className="text-sm text-white/60">{inv.akad_date}{inv.akad_time && ` · ${inv.akad_time}`}</p>
-                  {inv.akad_venue && <p className="text-sm text-white/40 mt-1">{inv.akad_venue}</p>}
-                  {inv.akad_address && <p className="text-xs text-white/30 mt-0.5">{inv.akad_address}</p>}
+              <Reveal delay={100} direction="left">
+                <div className="flex gap-6 items-start rounded-xl p-6 border" style={{ backgroundColor: '#0D1117', borderColor: `${color}22` }}>
+                  <div className="w-10 h-10 rounded-lg shrink-0 flex items-center justify-center font-black text-xs text-white" style={{ backgroundColor: color }}>01</div>
+                  <div>
+                    <p className="font-bold text-white mb-1">Akad Nikah</p>
+                    <p className="text-sm text-white/60">{inv.akad_date}{inv.akad_time && ` · ${inv.akad_time}`}</p>
+                    {inv.akad_venue && <p className="text-sm text-white/40 mt-1">{inv.akad_venue}</p>}
+                    {inv.akad_address && <p className="text-xs text-white/30 mt-0.5">{inv.akad_address}</p>}
+                  </div>
                 </div>
-              </div>
+              </Reveal>
             )}
             {inv.reception_date && (
-              <div className="flex gap-6 items-start rounded-xl p-6 border" style={{ backgroundColor: '#0D1117', borderColor: `${P}22` }}>
-                <div className="w-10 h-10 rounded-lg shrink-0 flex items-center justify-center font-black text-xs text-white" style={{ backgroundColor: P }}>02</div>
-                <div>
-                  <p className="font-bold text-white mb-1">Resepsi</p>
-                  <p className="text-sm text-white/60">{inv.reception_date}{inv.reception_time && ` · ${inv.reception_time}`}</p>
-                  {inv.reception_venue && <p className="text-sm text-white/40 mt-1">{inv.reception_venue}</p>}
-                  {inv.reception_address && <p className="text-xs text-white/30 mt-0.5">{inv.reception_address}</p>}
+              <Reveal delay={200} direction="left">
+                <div className="flex gap-6 items-start rounded-xl p-6 border" style={{ backgroundColor: '#0D1117', borderColor: `${color}22` }}>
+                  <div className="w-10 h-10 rounded-lg shrink-0 flex items-center justify-center font-black text-xs text-white" style={{ backgroundColor: color }}>02</div>
+                  <div>
+                    <p className="font-bold text-white mb-1">Resepsi</p>
+                    <p className="text-sm text-white/60">{inv.reception_date}{inv.reception_time && ` · ${inv.reception_time}`}</p>
+                    {inv.reception_venue && <p className="text-sm text-white/40 mt-1">{inv.reception_venue}</p>}
+                    {inv.reception_address && <p className="text-xs text-white/30 mt-0.5">{inv.reception_address}</p>}
+                  </div>
                 </div>
-              </div>
+              </Reveal>
             )}
           </div>
         </div>
       </section>
 
-      {/* ── Closing ── */}
+      {/* Closing */}
       <section className="py-20 px-8 text-center max-w-xl mx-auto">
-        <p className="text-white/40 text-sm italic leading-relaxed">
-          {inv.closing_message || 'Merupakan suatu kehormatan apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu kepada kedua mempelai.'}
-        </p>
-        <p className="mt-10 font-black text-xl text-white" style={{ letterSpacing: '-0.02em' }}>
-          {inv.groom_name} <span className="font-normal text-white/40">&</span> {inv.bride_name}
-        </p>
-        <div className="w-8 h-1 mx-auto mt-6 rounded-full" style={{ backgroundColor: P }} />
+        <Reveal>
+          <p className="text-white/40 text-sm italic leading-relaxed">
+            {inv.closing_message || 'Merupakan suatu kehormatan apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu kepada kedua mempelai.'}
+          </p>
+          <p className="mt-10 font-black text-xl text-white" style={{ letterSpacing: '-0.02em' }}>
+            {inv.groom_name} <span className="font-normal text-white/40">&</span> {inv.bride_name}
+          </p>
+          <div className="w-8 h-1 mx-auto mt-6 rounded-full" style={{ backgroundColor: color }} />
+        </Reveal>
       </section>
+    </div>
+  );
+}
+
+export function ModernTemplate({ inv }: { inv: Invitation }) {
+  const P = inv.primary_color || '#1A3A5C';
+  const [opened, setOpened] = useState(false);
+  return (
+    <div className="min-h-screen w-full" style={{ fontFamily: "'Montserrat','Arial',sans-serif", backgroundColor: '#0D1117' }}>
+      {inv.music_url && <MusicPlayer url={inv.music_url} color={P} />}
+      {!opened && <ModernSplash inv={inv} color={P} onOpen={() => setOpened(true)} />}
+      {opened  && <InvitationContent inv={inv} color={P} />}
     </div>
   );
 }
