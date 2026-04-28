@@ -28,6 +28,12 @@ export interface Invitation {
   primary_color: string;
   cover_image_url: string;
   music_url: string;
+
+  // Gift / payment (optional)
+  bank_name: string;
+  bank_account_number: string;
+  bank_account_name: string;
+  qris_image_url: string;
 }
 
 export type InvitationInsert = Omit<Invitation, 'id' | 'created_at'>;

@@ -64,6 +64,10 @@ interface FormData {
   cover_image_url: string;
   music_url: string;
   primary_color: string;
+  bank_name: string;
+  bank_account_number: string;
+  bank_account_name: string;
+  qris_image_url: string;
 }
 
 function empty(): FormData {
@@ -75,6 +79,7 @@ function empty(): FormData {
     opening_message: '', closing_message: '', cover_image_url: '',
     music_url: '/music/Beautiful In White.mp3',
     primary_color: '#9F1239',
+    bank_name: '', bank_account_number: '', bank_account_name: '', qris_image_url: '',
   };
 }
 
@@ -384,6 +389,31 @@ export default function NewInvitationPage() {
               ))}
             </div>
           </div>
+        </Section>
+
+        {/* Gift / Payment */}
+        <Section title="Hadiah (Opsional)" color={P}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Field label="Nama Bank">
+              <Input value={form.bank_name} onChange={v => set('bank_name', v)} placeholder="BCA / Mandiri / BNI" />
+            </Field>
+            <Field label="Nomor Rekening">
+              <Input value={form.bank_account_number} onChange={v => set('bank_account_number', v)} placeholder="1234567890" />
+            </Field>
+            <Field label="Atas Nama">
+              <Input value={form.bank_account_name} onChange={v => set('bank_account_name', v)} placeholder="Nama pemilik rekening" />
+            </Field>
+            <Field label="URL Gambar QRIS">
+              <Input value={form.qris_image_url} onChange={v => set('qris_image_url', v)} placeholder="https://... (URL gambar QRIS)" />
+            </Field>
+          </div>
+          {form.qris_image_url && (
+            <div className="mt-4 flex items-center gap-3">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={form.qris_image_url} alt="QRIS preview" className="w-20 h-20 object-contain rounded-lg border border-slate-200" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+              <p className="text-xs text-slate-400">Preview QRIS</p>
+            </div>
+          )}
         </Section>
 
         {error && (

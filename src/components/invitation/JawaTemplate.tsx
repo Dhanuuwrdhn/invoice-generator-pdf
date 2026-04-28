@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Invitation } from '@/types/invitation';
-import { MusicPlayer, Reveal } from './shared';
+import { MusicPlayer, Reveal, GiftSection } from './shared';
 
 /* ── Batik-inspired SVG pattern ─────────────────────────────────── */
 function BatikPattern({ color, opacity = 0.07 }: { color: string; opacity?: number }) {
@@ -347,6 +347,8 @@ function InvitationContent({ inv, color }: { inv: Invitation; color: string }) {
           )}
         </div>
       </section>
+
+      <GiftSection inv={inv} color={color} />
 
       {/* ── Closing ── */}
       <section className="py-16 px-6 text-center max-w-lg mx-auto relative overflow-hidden">

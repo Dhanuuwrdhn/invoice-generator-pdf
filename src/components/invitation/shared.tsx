@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { Invitation } from '@/types/invitation';
 
 export function MusicPlayer({ url, color }: { url: string; color: string }) {
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -88,4 +89,75 @@ export function Reveal({
   }, [delay, direction]);
 
   return <div ref={ref} className={className}>{children}</div>;
+}
+
+/* ── Gift / Payment section — shared across all templates ────────── */
+export function GiftSection({ inv, color }: { inv: Invitation; color: string }) {
+  const hasBank = inv.bank_name || inv.bank_account_number;
+  const hasQris = inv.qris_image_url;
+  if (!hasBank && !hasQris) return null;
+
+  const [copied, setCopied] = useState(false);
+
+  function copyAcct() {
+    navigator.clipboard.writeText(inv.bank_account_number);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
+  return (
+    <Reveal>
+      <section className="py-16 px-6 max-w-xl mx-auto text-center">
+        <p className="text-xs tracking-[0.3em] uppercase mb-2" style={{ color: `${color}88` }}>Hadiah</p>
+        <h2 style={{ fontFamily: "'Dancing Script',cursive", fontSize: '2.2rem', color, marginBottom: 8 }}>
+          Wedding Gift
+        </h2>
+        <p className="text-sm text-slate-400 mb-8 italic">
+          Doa restu Anda adalah hadiah terbaik. Namun jika ingin memberi, berikut informasinya:
+        </p>
+
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          {/* Bank transfer */}
+          {hasBank && (
+            <div className="flex-1 rounded-2xl border bg-white p-5 text-left shadow-sm" style={{ borderColor: `${color}22` }}>
+              <p className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: `${color}88` }}>Transfer Bank</p>
+              <p className="font-bold text-slate-700">{inv.bank_name}</p>
+              <div className="flex items-center gap-2 mt-1">
+                <p className="font-mono font-semibold text-slate-800 text-lg">{inv.bank_account_number}</p>
+                <button
+                  onClick={copyAcct}
+                  title="Salin nomor rekening"
+                  className="ml-auto shrink-0 transition-all"
+                  style={{ color: copied ? '#16a34a' : `${color}88` }}
+                >
+                  {copied ? (
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  ) : (
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" strokeWidth="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke="currentColor" strokeWidth="2"/></svg>
+                  )}
+                </button>
+              </div>
+              {inv.bank_account_name && (
+                <p className="text-sm text-slate-500 mt-1">a.n. {inv.bank_account_name}</p>
+              )}
+            </div>
+          )}
+
+          {/* QRIS */}
+          {hasQris && (
+            <div className="flex-1 rounded-2xl border bg-white p-5 text-center shadow-sm" style={{ borderColor: `${color}22` }}>
+              <p className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: `${color}88` }}>QRIS</p>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={inv.qris_image_url}
+                alt="QRIS"
+                className="w-40 h-40 mx-auto object-contain rounded-lg"
+              />
+              <p className="text-xs text-slate-400 mt-2">Scan untuk transfer</p>
+            </div>
+          )}
+        </div>
+      </section>
+    </Reveal>
+  );
 }
