@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { Invitation } from '@/types/invitation';
-import { MusicPlayer, Reveal, GiftSection } from './shared';
+import { MusicPlayer, Reveal, GiftSection, CouplePhotoSection, LoveStorySection } from './shared';
 
 /* ── Divider ───────────────────────────────────────────────────── */
 function Divider({ color }: { color: string }) {
@@ -231,6 +231,9 @@ function InvitationContent({ inv, color }: { inv: Invitation; color: string }) {
           ))}
         </div>
       </section>
+
+      <CouplePhotoSection inv={inv} color={color} theme="light" />
+      <LoveStorySection   inv={inv} color={color} theme="light" />
 
       {/* ── Events ── */}
       <section className="py-20 px-6">

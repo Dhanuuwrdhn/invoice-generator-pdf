@@ -62,6 +62,10 @@ interface FormData {
   opening_message: string;
   closing_message: string;
   cover_image_url: string;
+  couple_image_url: string;
+  photo_2_url: string;
+  photo_3_url: string;
+  love_story_text: string;
   music_url: string;
   primary_color: string;
   bank_name: string;
@@ -77,6 +81,7 @@ function empty(): FormData {
     akad_date: '', akad_time: '', akad_venue: '', akad_address: '',
     reception_date: '', reception_time: '', reception_venue: '', reception_address: '',
     opening_message: '', closing_message: '', cover_image_url: '',
+    couple_image_url: '', photo_2_url: '', photo_3_url: '', love_story_text: '',
     music_url: '/music/Beautiful In White.mp3',
     primary_color: '#9F1239',
     bank_name: '', bank_account_number: '', bank_account_name: '', qris_image_url: '',
@@ -353,6 +358,51 @@ export default function NewInvitationPage() {
             </Field>
             <Field label="URL Foto Cover (opsional)" full>
               <Input value={form.cover_image_url} onChange={v => set('cover_image_url', v)} placeholder="https://... (URL foto)" />
+            </Field>
+          </div>
+        </Section>
+
+        {/* Foto & Cerita Cinta */}
+        <Section title="Foto & Cerita Cinta (Opsional)" color={P}>
+          <p className="text-xs text-slate-400 mb-4">Tambahkan foto pasangan dan cerita cinta untuk membuat undangan lebih personal dan romantis.</p>
+          <div className="space-y-4">
+            <Field label="Foto Pasangan (Ken Burns section)" full>
+              <Input value={form.couple_image_url} onChange={v => set('couple_image_url', v)} placeholder="https://... (URL foto berdua)" />
+              {form.couple_image_url && (
+                <div className="mt-2">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={form.couple_image_url} alt="preview" className="h-24 w-full object-cover rounded-lg border border-slate-200" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                </div>
+              )}
+            </Field>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Field label="Foto Love Story — Background">
+                <Input value={form.photo_2_url} onChange={v => set('photo_2_url', v)} placeholder="https://... (foto latar)" />
+                {form.photo_2_url && (
+                  <div className="mt-2">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={form.photo_2_url} alt="preview" className="h-20 w-full object-cover rounded-lg border border-slate-200" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                  </div>
+                )}
+              </Field>
+              <Field label="Foto Love Story — Portrait">
+                <Input value={form.photo_3_url} onChange={v => set('photo_3_url', v)} placeholder="https://... (foto portrait)" />
+                {form.photo_3_url && (
+                  <div className="mt-2">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={form.photo_3_url} alt="preview" className="h-20 w-full object-cover rounded-lg border border-slate-200" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                  </div>
+                )}
+              </Field>
+            </div>
+            <Field label="Cerita Cinta" full>
+              <textarea
+                value={form.love_story_text}
+                onChange={e => set('love_story_text', e.target.value)}
+                rows={4}
+                placeholder="Ceritakan kisah pertemuan kalian, momen spesial, atau ungkapan rasa syukur…"
+                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
+              />
             </Field>
           </div>
         </Section>

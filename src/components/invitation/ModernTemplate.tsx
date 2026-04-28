@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Invitation } from '@/types/invitation';
-import { MusicPlayer, Reveal, GiftSection } from './shared';
+import { MusicPlayer, Reveal, GiftSection, CouplePhotoSection, LoveStorySection } from './shared';
 
 /* ── Modern splash — full dark, animated lines ── */
 function ModernSplash({ inv, color, onOpen }: { inv: Invitation; color: string; onOpen: () => void }) {
@@ -135,6 +135,9 @@ function InvitationContent({ inv, color }: { inv: Invitation; color: string }) {
           </Reveal>
         ))}
       </section>
+
+      <CouplePhotoSection inv={inv} color={color} theme="dark" />
+      <LoveStorySection   inv={inv} color={color} theme="dark" />
 
       {/* Events */}
       <section className="py-20 px-8" style={{ backgroundColor: '#161B22' }}>

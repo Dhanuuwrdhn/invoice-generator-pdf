@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Invitation } from '@/types/invitation';
-import { MusicPlayer, Reveal, GiftSection } from './shared';
+import { MusicPlayer, Reveal, GiftSection, CouplePhotoSection, LoveStorySection, PhotoBgSection } from './shared';
 
 /* ── Elegant splash — dark veil + monogram ── */
 function ElegantSplash({ inv, color, onOpen }: { inv: Invitation; color: string; onOpen: () => void }) {
@@ -117,6 +117,9 @@ function InvitationContent({ inv, color }: { inv: Invitation; color: string }) {
         </Reveal>
         <div className="w-12 h-px mx-auto mt-10" style={{ backgroundColor: color }} />
       </section>
+
+      <CouplePhotoSection inv={inv} color={color} theme="light" />
+      <LoveStorySection   inv={inv} color={color} theme="light" />
 
       {/* Events */}
       <section className="py-16 px-6" style={{ backgroundColor: `${color}0d` }}>
