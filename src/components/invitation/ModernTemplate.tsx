@@ -31,7 +31,7 @@ function ModernSplash({ inv, color, onOpen }: { inv: Invitation; color: string; 
       <div className="absolute left-0 top-0 w-1 h-full" style={{ backgroundColor: color, opacity: 0.6 }} />
 
       {/* Grid pattern background */}
-      <div className="absolute inset-0 opacity-5" style={{
+      <div className="absolute inset-0 opacity-5 pointer-events-none" style={{
         backgroundImage: `linear-gradient(${color} 1px, transparent 1px), linear-gradient(90deg, ${color} 1px, transparent 1px)`,
         backgroundSize: '40px 40px',
       }} />

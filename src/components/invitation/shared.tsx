@@ -287,11 +287,10 @@ export function PhotoBgSection({
 
 /* ── Gift / Payment section — shared across all templates ────────── */
 export function GiftSection({ inv, color }: { inv: Invitation; color: string }) {
+  const [copied, setCopied] = useState(false);
   const hasBank = inv.bank_name || inv.bank_account_number;
   const hasQris = inv.qris_image_url;
   if (!hasBank && !hasQris) return null;
-
-  const [copied, setCopied] = useState(false);
 
   function copyAcct() {
     navigator.clipboard.writeText(inv.bank_account_number);
