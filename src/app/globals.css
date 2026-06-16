@@ -1,40 +1,40 @@
 @import "tailwindcss";
 
 :root {
-  /* ── Claude design palette ── */
-  --background: #F0EEE6;   /* warm bone */
-  --surface:    #FFFFFF;
-  --surface-2:  #FAF9F5;
-  --foreground: #1F1E1D;   /* warm near-black */
-  --muted:      #73726C;
-  --border:     #E5E3DA;
-  --accent:     #C96442;   /* Claude clay */
-  --accent-hover: #B5573A;
-  --accent-soft:  #F3E6DF;
+  /* ── Fiscal ledger palette ── */
+  --paper:     #E7EBE2;   /* pale sage ledger pad */
+  --surface:   #F6F7F1;   /* warm paper white */
+  --ink:       #19261F;   /* deep pine ink */
+  --ink-soft:  #5C6A5E;   /* muted ink */
+  --rule:      #C9D1C2;   /* sage rule */
+  --rule-soft: #D7DDCF;
+  --green:     #0B5C42;   /* accounting green — primary / paid / go */
+  --green-hov: #094B36;
+  --green-soft:#DCE7DF;
+  --red:       #A6392B;   /* ledger debit — totals, emphasis, danger */
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-surface:    var(--surface);
-  --color-muted:      var(--muted);
-  --color-border:     var(--border);
-  --color-accent:     var(--accent);
-  --font-sans:  'Inter', ui-sans-serif, system-ui, sans-serif;
-  --font-serif: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --color-background: var(--paper);
+  --color-foreground: var(--ink);
+  --font-sans:    'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --font-mono:    'Space Mono', ui-monospace, monospace;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Space Grotesk', ui-sans-serif, system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
 input, select, textarea, button {
-  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  font-family: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
 }
 
-.font-serif {
-  font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+.font-mono { font-family: 'Space Mono', ui-monospace, monospace; }
+.tnum { font-variant-numeric: tabular-nums; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
 }

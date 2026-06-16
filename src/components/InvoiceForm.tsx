@@ -256,23 +256,23 @@ export function InvoiceForm() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F0EEE6]" style={{ fontFamily: fontCss }}>
+    <div className="min-h-screen bg-[#E7EBE2]" style={{ fontFamily: fontCss }}>
 
       {/* ── Top bar ── */}
-      <div className="sticky top-0 z-20 bg-[#F0EEE6]/85 backdrop-blur-md border-b border-[#E5E3DA]">
+      <div className="sticky top-0 z-20 bg-[#E7EBE2]/85 backdrop-blur-md border-b border-[#C9D1C2]">
         <div className="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
-          <Link href="/" className="flex items-center gap-1.5 text-[#73726C] hover:text-[#1F1E1D] transition-colors shrink-0">
+          <Link href="/" className="flex items-center gap-1.5 text-[#5C6A5E] hover:text-[#19261F] transition-colors shrink-0">
             <ArrowLeft size={15} />
             <span className="text-sm font-medium">Back</span>
           </Link>
-          <span className="font-serif font-semibold text-base text-[#1F1E1D]">Invoice<span className="text-[#C96442]">PDF</span></span>
+          <span className="font-mono text-sm font-bold tracking-tight text-[#19261F]">INVOICE<span className="text-[#0B5C42]">·</span>PDF</span>
           <button
             onClick={handleGenerate}
             disabled={loading}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#C96442] text-white text-sm font-medium transition-colors hover:bg-[#B5573A] disabled:opacity-50 shrink-0"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-md bg-[#0B5C42] text-[#F6F7F1] font-mono text-[13px] font-bold tracking-tight transition-colors hover:bg-[#094B36] disabled:opacity-50 shrink-0"
           >
             <Download size={14} />
-            {loading ? 'Generating…' : 'Generate PDF'}
+            {loading ? 'GENERATING…' : 'GENERATE PDF'}
           </button>
         </div>
       </div>
@@ -280,11 +280,11 @@ export function InvoiceForm() {
       <div className="max-w-3xl mx-auto px-4 py-6 space-y-5">
 
         {/* ── Toolbar card: Font + Template ── */}
-        <div className="bg-white rounded-xl border border-[#E5E3DA] shadow-sm divide-y divide-[#EDEBE3]">
+        <div className="bg-white rounded-lg border border-[#C9D1C2] divide-y divide-[#D7DDCF]">
 
           {/* Font picker */}
           <div className="px-5 py-4">
-            <p className="text-xs font-semibold text-[#A3A299] uppercase tracking-widest mb-3">PDF Font</p>
+            <p className="font-mono text-[10px] font-bold text-[#5C6A5E] uppercase tracking-[0.18em] mb-3">PDF Font</p>
             <div className="flex gap-2 flex-wrap">
               {FONTS.map(f => {
                 const active = (data.fontFamily || 'Caladea') === f.value;
@@ -295,12 +295,12 @@ export function InvoiceForm() {
                     className="flex flex-col items-start px-4 py-2.5 rounded-lg border-2 transition-all"
                     style={{
                       fontFamily: FONT_CSS[f.value],
-                      borderColor: active ? '#C96442' : '#E5E3DA',
-                      backgroundColor: active ? '#F3E6DF' : '#fff',
+                      borderColor: active ? '#0B5C42' : '#C9D1C2',
+                      backgroundColor: active ? '#DCE7DF' : '#fff',
                     }}
                   >
-                    <span className="text-sm font-semibold" style={{ color: active ? '#C96442' : '#3D3D3A' }}>{f.label}</span>
-                    <span className="text-xs text-[#A3A299]">{f.desc}</span>
+                    <span className="text-sm font-semibold" style={{ color: active ? '#0B5C42' : '#33433A' }}>{f.label}</span>
+                    <span className="text-xs text-[#8A9587]">{f.desc}</span>
                   </button>
                 );
               })}
@@ -309,7 +309,7 @@ export function InvoiceForm() {
 
           {/* Color picker */}
           <div className="px-5 py-4">
-            <p className="text-xs font-semibold text-[#A3A299] uppercase tracking-widest mb-3">PDF Color</p>
+            <p className="font-mono text-[10px] font-bold text-[#5C6A5E] uppercase tracking-[0.18em] mb-3">PDF Color</p>
             <div className="flex items-center gap-2 flex-wrap">
               {COLOR_PRESETS.map(c => {
                 const active = data.primaryColor === c.value;
@@ -330,7 +330,7 @@ export function InvoiceForm() {
               })}
               <label
                 title="Custom color"
-                className="w-7 h-7 rounded-full border-2 border-dashed border-[#D8D6CC] flex items-center justify-center cursor-pointer overflow-hidden hover:border-[#A3A299] transition-colors"
+                className="w-7 h-7 rounded-full border-2 border-dashed border-[#BCC6B6] flex items-center justify-center cursor-pointer overflow-hidden hover:border-[#8A9587] transition-colors"
                 style={{ position: 'relative' }}
               >
                 <input
@@ -339,56 +339,56 @@ export function InvoiceForm() {
                   onChange={e => set('primaryColor', e.target.value)}
                   className="opacity-0 absolute inset-0 w-full h-full cursor-pointer"
                 />
-                <span className="text-[#A3A299] text-xs font-bold pointer-events-none">+</span>
+                <span className="text-[#8A9587] text-xs font-bold pointer-events-none">+</span>
               </label>
-              <span className="text-xs text-[#A3A299] font-mono">{data.primaryColor}</span>
+              <span className="text-xs text-[#8A9587] font-mono">{data.primaryColor}</span>
             </div>
           </div>
 
           {/* Template picker */}
           <div className="px-5 py-4">
-            <p className="text-xs font-semibold text-[#A3A299] uppercase tracking-widest mb-3">Templates</p>
+            <p className="font-mono text-[10px] font-bold text-[#5C6A5E] uppercase tracking-[0.18em] mb-3">Templates</p>
             <div className="flex gap-2 flex-wrap items-start">
 
               {/* Dropdown */}
               <div className="relative">
                 <button
                   onClick={() => setTemplateOpen(o => !o)}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-[#E5E3DA] bg-white text-sm font-semibold text-[#3D3D3A] hover:border-[#D8D6CC] transition-all"
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-[#C9D1C2] bg-white text-sm font-semibold text-[#33433A] hover:border-[#BCC6B6] transition-all"
                 >
                   Load Template
                   <ChevronDown size={14} className={`transition-transform ${templateOpen ? 'rotate-180' : ''}`} />
                 </button>
                 {templateOpen && (
-                  <div className="absolute top-full left-0 mt-1 w-72 bg-white border border-[#E5E3DA] rounded-xl shadow-lg z-30 overflow-hidden">
-                    <div className="px-3 py-2 text-xs font-bold text-[#A3A299] uppercase tracking-widest border-b border-[#EDEBE3]">
+                  <div className="absolute top-full left-0 mt-1 w-72 bg-white border border-[#C9D1C2] rounded-xl shadow-lg z-30 overflow-hidden">
+                    <div className="px-3 py-2 text-xs font-bold text-[#8A9587] uppercase tracking-widest border-b border-[#D7DDCF]">
                       Built-in
                     </div>
                     {BUILTIN_TEMPLATES.map(t => (
                       <button
                         key={t.id}
                         onClick={() => loadTemplate(t.data)}
-                        className="w-full text-left px-4 py-2.5 text-sm text-[#3D3D3A] hover:bg-[#FAF9F5] transition-colors"
+                        className="w-full text-left px-4 py-2.5 text-sm text-[#33433A] hover:bg-[#F6F7F1] transition-colors"
                       >
                         {t.name}
                       </button>
                     ))}
                     {savedTemplates.length > 0 && (
                       <>
-                        <div className="px-3 py-2 text-xs font-bold text-[#A3A299] uppercase tracking-widest border-t border-b border-[#EDEBE3] mt-1">
+                        <div className="px-3 py-2 text-xs font-bold text-[#8A9587] uppercase tracking-widest border-t border-b border-[#D7DDCF] mt-1">
                           Saved
                         </div>
                         {savedTemplates.map(t => (
                           <div key={t.id} className="flex items-center group">
                             <button
                               onClick={() => loadTemplate(t.data)}
-                              className="flex-1 text-left px-4 py-2.5 text-sm text-[#3D3D3A] hover:bg-[#FAF9F5] transition-colors"
+                              className="flex-1 text-left px-4 py-2.5 text-sm text-[#33433A] hover:bg-[#F6F7F1] transition-colors"
                             >
                               {t.name}
                             </button>
                             <button
                               onClick={() => deleteTemplate(t.id)}
-                              className="px-3 py-2.5 text-[#C9C7BD] hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+                              className="px-3 py-2.5 text-[#AAB6A2] hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
                             >
                               <Trash2 size={13} />
                             </button>
@@ -404,7 +404,7 @@ export function InvoiceForm() {
               {!saveMode ? (
                 <button
                   onClick={() => setSaveMode(true)}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-dashed border-[#D8D6CC] bg-white text-sm font-semibold text-[#73726C] hover:border-[#A3A299] transition-all"
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-dashed border-[#BCC6B6] bg-white text-sm font-semibold text-[#5C6A5E] hover:border-[#8A9587] transition-all"
                 >
                   <Save size={14} />
                   Save Current
@@ -417,10 +417,10 @@ export function InvoiceForm() {
                     onChange={e => setSaveName(e.target.value)}
                     onKeyDown={e => { if (e.key === 'Enter') handleSave(); if (e.key === 'Escape') { setSaveMode(false); setSaveName(''); } }}
                     placeholder="Template name…"
-                    className="border border-[#D8D6CC] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C96442]/30 w-44"
+                    className="border border-[#BCC6B6] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B5C42]/30 w-44"
                   />
-                  <button onClick={handleSave} className="px-3 py-2 rounded-lg bg-[#C96442] text-white text-sm font-medium transition-colors hover:bg-[#B5573A]">Save</button>
-                  <button onClick={() => { setSaveMode(false); setSaveName(''); }} className="px-3 py-2 rounded-lg border border-[#E5E3DA] text-sm text-[#73726C] hover:bg-[#FAF9F5]">Cancel</button>
+                  <button onClick={handleSave} className="px-3 py-2 rounded-lg bg-[#0B5C42] text-white text-sm font-medium transition-colors hover:bg-[#094B36]">Save</button>
+                  <button onClick={() => { setSaveMode(false); setSaveName(''); }} className="px-3 py-2 rounded-lg border border-[#C9D1C2] text-sm text-[#5C6A5E] hover:bg-[#F6F7F1]">Cancel</button>
                 </div>
               )}
 
@@ -432,7 +432,7 @@ export function InvoiceForm() {
         {templateOpen && <div className="fixed inset-0 z-10" onClick={() => setTemplateOpen(false)} />}
 
         {/* ── 1. Sender Information ── */}
-        <Section title="Sender Information" color={data.primaryColor}>
+        <Section n="01" title="Sender Information">
           <Grid>
             <Field label="Full Name">
               <Input value={data.senderName} onChange={v => set('senderName', v)} placeholder="Your name" fontCss={fontCss} />
@@ -453,7 +453,7 @@ export function InvoiceForm() {
         </Section>
 
         {/* ── 2. Client Information ── */}
-        <Section title="Client Information" color={data.primaryColor}>
+        <Section n="02" title="Client Information">
           <Grid>
             <Field label="Company Name">
               <Input value={data.clientCompany} onChange={v => set('clientCompany', v)} placeholder="PT. Company Name" fontCss={fontCss} />
@@ -473,7 +473,7 @@ export function InvoiceForm() {
                 onChange={e => set('clientAddress', e.target.value)}
                 placeholder="Street, district, city, postal code"
                 rows={3}
-                className="w-full border border-[#E5E3DA] rounded-lg px-3 py-2 text-sm text-[#1F1E1D] focus:outline-none focus:ring-2 focus:ring-[#C96442]/30 focus:border-transparent resize-none"
+                className="w-full border border-[#C9D1C2] rounded-lg px-3 py-2 text-sm text-[#19261F] focus:outline-none focus:ring-2 focus:ring-[#0B5C42]/30 focus:border-transparent resize-none"
                 style={{ fontFamily: fontCss }}
               />
             </Field>
@@ -481,7 +481,7 @@ export function InvoiceForm() {
         </Section>
 
         {/* ── 3. Invoice Details ── */}
-        <Section title="Invoice Details" color={data.primaryColor}>
+        <Section n="03" title="Invoice Details">
           <Grid>
             <Field label="Invoice Number">
               <Input value={data.invoiceNumber} onChange={v => set('invoiceNumber', v)} placeholder="INV-DP/001/IV/2026" fontCss={fontCss} />
@@ -490,7 +490,7 @@ export function InvoiceForm() {
               <select
                 value={data.invoiceType}
                 onChange={e => set('invoiceType', e.target.value)}
-                className="w-full border border-[#E5E3DA] rounded-lg px-3 py-2 text-sm text-[#1F1E1D] bg-white focus:outline-none focus:ring-2 focus:ring-[#C96442]/30 focus:border-transparent"
+                className="w-full border border-[#C9D1C2] rounded-lg px-3 py-2 text-sm text-[#19261F] bg-white focus:outline-none focus:ring-2 focus:ring-[#0B5C42]/30 focus:border-transparent"
                 style={{ fontFamily: fontCss }}
               >
                 {INVOICE_TYPES.map(group => (
@@ -513,12 +513,12 @@ export function InvoiceForm() {
         </Section>
 
         {/* ── 4. Service Items ── */}
-        <Section title="Service Items" color={data.primaryColor}>
+        <Section n="04" title="Service Items">
           <div className="space-y-3">
             {data.items.map((item, i) => (
-              <div key={item.id} className="rounded-lg border border-[#E5E3DA] bg-[#FAF9F5] overflow-hidden">
-                <div className="flex items-center justify-between px-4 py-2.5 bg-[#F0EEE6] border-b border-[#E5E3DA]">
-                  <span className="text-xs font-bold text-[#A3A299] uppercase tracking-widest">Item {i + 1}</span>
+              <div key={item.id} className="rounded-lg border border-[#C9D1C2] bg-[#F6F7F1] overflow-hidden">
+                <div className="flex items-center justify-between px-4 py-2.5 bg-[#E7EBE2] border-b border-[#C9D1C2]">
+                  <span className="font-mono text-[10px] font-bold text-[#0B5C42] uppercase tracking-[0.18em]">Item {String(i + 1).padStart(2, '0')}</span>
                   {data.items.length > 1 && (
                     <button onClick={() => setData(p => ({ ...p, items: p.items.filter(x => x.id !== item.id) }))}
                       className="flex items-center gap-1 text-xs text-red-400 hover:text-red-600 font-medium transition-colors">
@@ -546,8 +546,8 @@ export function InvoiceForm() {
                     <Input value={String(item.price)} onChange={v => updateItem(item.id, 'price', parseFloat(v) || 0)} type="number" min="0" placeholder="5000000" fontCss={fontCss} />
                   </Field>
                   <Field label="Subtotal">
-                    <div className="px-3 py-2 bg-white border border-[#E5E3DA] rounded-lg text-sm font-bold text-[#3D3D3A]">
-                      Rp {formatCurrency(item.qty * item.price)}
+                    <div className="px-3 py-2 bg-white border border-[#C9D1C2] rounded-lg text-sm font-mono tnum font-bold text-[#33433A]">
+                      <span className="text-[#8A9587]">Rp</span> {formatCurrency(item.qty * item.price)}
                     </div>
                   </Field>
                 </div>
@@ -555,7 +555,7 @@ export function InvoiceForm() {
             ))}
             <button
               onClick={() => setData(p => ({ ...p, items: [...p.items, newItem()] }))}
-              className="w-full flex items-center justify-center gap-1.5 border-2 border-dashed border-[#D8D6CC] rounded-lg py-3 text-sm text-[#A3A299] transition-colors font-medium hover:border-current hover:text-current"
+              className="w-full flex items-center justify-center gap-1.5 border-2 border-dashed border-[#BCC6B6] rounded-lg py-3 text-sm text-[#8A9587] transition-colors font-medium hover:border-current hover:text-current"
               style={{ '--hover-color': data.primaryColor } as React.CSSProperties}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = data.primaryColor; (e.currentTarget as HTMLElement).style.color = data.primaryColor; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = ''; (e.currentTarget as HTMLElement).style.color = ''; }}
@@ -566,7 +566,7 @@ export function InvoiceForm() {
         </Section>
 
         {/* ── 5. Payment Information ── */}
-        <Section title="Payment Information" color={data.primaryColor}>
+        <Section n="05" title="Payment Information">
           <Grid>
             <Field label="Bank Name">
               <Input value={data.bankName} onChange={v => set('bankName', v)} placeholder="BCA / Mandiri / BNI" fontCss={fontCss} />
@@ -581,7 +581,7 @@ export function InvoiceForm() {
         </Section>
 
         {/* ── 6. Summary ── */}
-        <Section title="Summary" color={data.primaryColor}>
+        <Section n="06" title="Summary">
           <Grid>
             <Field label="Discount (Rp)">
               <Input value={String(data.discount)} onChange={v => set('discount', parseFloat(v) || 0)} type="number" min="0" placeholder="0" fontCss={fontCss} />
@@ -590,31 +590,31 @@ export function InvoiceForm() {
               <Input value={String(data.taxRate)} onChange={v => set('taxRate', parseFloat(v) || 0)} type="number" min="0" max="100" step="0.1" placeholder="0" fontCss={fontCss} />
             </Field>
           </Grid>
-          <div className="mt-4 rounded-xl overflow-hidden border border-[#E5E3DA]">
+          <div className="mt-4 rounded-lg overflow-hidden border border-[#C9D1C2]">
             <SummaryRow label="Subtotal"              value={`Rp ${formatCurrency(subtotal)}`} />
             <SummaryRow label="Discount"              value={`– Rp ${formatCurrency(data.discount)}`} />
             <SummaryRow label={`Tax (${data.taxRate}%)`} value={`Rp ${formatCurrency(taxAmt)}`} />
-            <div className="flex justify-between items-center px-5 py-3.5" style={{ backgroundColor: data.primaryColor }}>
-              <span className="font-bold text-white text-sm" style={{ fontFamily: fontCss }}>Total Invoice</span>
-              <span className="font-bold text-white text-lg" style={{ fontFamily: fontCss }}>Rp {formatCurrency(total)}</span>
+            <div className="flex justify-between items-center px-5 py-4 bg-[#19261F]">
+              <span className="font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-[#9DAD9F]">Total Invoice</span>
+              <span className="font-mono tnum font-bold text-white text-xl"><span className="text-[#7FBfA0] text-sm align-top mr-0.5">Rp</span>{formatCurrency(total)}</span>
             </div>
           </div>
         </Section>
 
         {/* ── Error + Generate button ── */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-600 rounded-xl px-4 py-3 text-sm">{error}</div>
+          <div className="bg-[#F7E9E6] border border-[#E3B7AF] text-[#A6392B] rounded-md px-4 py-3 text-sm font-mono">{error}</div>
         )}
         <button
           onClick={handleGenerate}
           disabled={loading}
-          className="w-full py-4 rounded-xl bg-[#C96442] text-white font-medium text-base transition-colors hover:bg-[#B5573A] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="w-full py-4 rounded-md bg-[#0B5C42] text-[#F6F7F1] font-mono text-sm font-bold tracking-tight transition-colors hover:bg-[#094B36] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           <Download size={18} />
-          {loading ? 'Generating PDF…' : 'Generate & Download PDF'}
+          {loading ? 'GENERATING PDF…' : 'GENERATE & DOWNLOAD PDF'}
         </button>
 
-        <p className="text-center text-xs text-[#A3A299] pb-4">
+        <p className="text-center text-xs text-[#8A9587] pb-4">
           PDF will be downloaded automatically to your device
         </p>
       </div>
@@ -624,11 +624,12 @@ export function InvoiceForm() {
 
 // ── Reusable primitives ────────────────────────────────────────────────────────
 
-function Section({ title, color, children }: { title: string; color: string; children: React.ReactNode }) {
+function Section({ n, title, children }: { n: string; title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-white rounded-xl border border-[#E5E3DA] shadow-sm overflow-hidden">
-      <div className="px-5 py-3 border-b border-[#EDEBE3] bg-[#FAF9F5]">
-        <h2 className="text-xs font-bold tracking-widest uppercase" style={{ color }}>{title}</h2>
+    <div className="bg-white rounded-lg border border-[#C9D1C2] overflow-hidden">
+      <div className="flex items-center gap-3 px-5 py-3 border-b border-[#D7DDCF] bg-[#F6F7F1]">
+        <span className="font-mono text-[11px] font-bold text-[#0B5C42]">{n}</span>
+        <h2 className="font-mono text-[11px] font-bold tracking-[0.18em] uppercase text-[#19261F]">{title}</h2>
       </div>
       <div className="px-5 py-4">{children}</div>
     </div>
@@ -642,7 +643,7 @@ function Grid({ children }: { children: React.ReactNode }) {
 function Field({ label, children, full }: { label: string; children: React.ReactNode; full?: boolean }) {
   return (
     <div className={full ? 'sm:col-span-2' : ''}>
-      <label className="block text-xs font-semibold text-[#A3A299] mb-1.5 uppercase tracking-widest">{label}</label>
+      <label className="block font-mono text-[10px] font-bold text-[#5C6A5E] mb-1.5 uppercase tracking-[0.14em]">{label}</label>
       {children}
     </div>
   );
@@ -656,7 +657,7 @@ function Input({ value, onChange, placeholder, type = 'text', min, max, step, fo
     <input
       type={type} value={value} placeholder={placeholder} min={min} max={max} step={step}
       onChange={e => onChange(e.target.value)}
-      className="w-full border border-[#E5E3DA] rounded-lg px-3 py-2 text-sm text-[#1F1E1D] bg-white focus:outline-none focus:ring-2 focus:ring-[#C96442]/30 focus:border-transparent transition-shadow"
+      className="w-full border border-[#C9D1C2] rounded-lg px-3 py-2 text-sm text-[#19261F] bg-white focus:outline-none focus:ring-2 focus:ring-[#0B5C42]/30 focus:border-transparent transition-shadow"
       style={{ fontFamily: fontCss }}
     />
   );
@@ -664,9 +665,9 @@ function Input({ value, onChange, placeholder, type = 'text', min, max, step, fo
 
 function SummaryRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex justify-between items-center px-5 py-2.5 border-b border-[#EDEBE3] text-sm">
-      <span className="text-[#73726C]">{label}</span>
-      <span className="font-semibold text-[#1F1E1D]">{value}</span>
+    <div className="flex justify-between items-center px-5 py-2.5 border-b border-[#D7DDCF] text-sm bg-[#F6F7F1]">
+      <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#5C6A5E]">{label}</span>
+      <span className="font-mono tnum font-bold text-[#19261F]">{value}</span>
     </div>
   );
 }
