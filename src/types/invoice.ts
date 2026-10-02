@@ -8,7 +8,8 @@ export interface InvoiceItem {
   price: number;
 }
 
-export type FontChoice = 'Caladea' | 'Lato' | 'Montserrat';
+export const FONT_CHOICES = ['Caladea', 'Lato', 'Montserrat'] as const;
+export type FontChoice = (typeof FONT_CHOICES)[number];
 
 export interface InvoiceData {
   fontFamily: FontChoice;
