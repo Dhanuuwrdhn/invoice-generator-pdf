@@ -32,7 +32,7 @@ export default function LandingPage() {
           INVOICE<span className="text-[#0B5C42]">·</span>PDF
         </span>
         <Link
-          href="/generator"
+          href="/invoices/new"
           className="font-mono text-[13px] font-bold tracking-tight px-4 py-2 rounded-md bg-[#0B5C42] text-[#F6F7F1] transition-colors hover:bg-[#094B36]"
         >
           NEW INVOICE →
@@ -57,7 +57,7 @@ export default function LandingPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-3">
             <Link
-              href="/generator"
+              href="/invoices/new"
               className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-md font-mono text-sm font-bold tracking-tight bg-[#0B5C42] text-[#F6F7F1] transition-colors hover:bg-[#094B36]"
             >
               MAKE AN INVOICE <ArrowRight size={16} />
@@ -170,7 +170,7 @@ export default function LandingPage() {
             No registration, no payment, nothing stored. Open, fill, download.
           </p>
           <Link
-            href="/generator"
+            href="/invoices/new"
             className="inline-flex items-center gap-2 px-7 py-3.5 rounded-md font-mono text-sm font-bold tracking-tight bg-[#0B5C42] text-[#F6F7F1] transition-colors hover:bg-[#0d6e4f]"
           >
             START NOW <ArrowRight size={16} />

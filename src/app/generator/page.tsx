@@ -1,9 +1,5 @@
-import { InvoiceForm } from '@/components/InvoiceForm';
-
-export const metadata = {
-  title: 'Generator — Invoice PDF',
-};
+import { redirect } from 'next/navigation';
 
 export default function GeneratorPage() {
-  return <InvoiceForm />;
+  redirect('/invoices/new');
 }

@@ -1,10 +1,16 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { ArrowLeft, Download, Plus, X, Save, ChevronDown, Trash2 } from 'lucide-react';
-import { InvoiceData, InvoiceItem, FontChoice } from '@/types/invoice';
+import { InvoiceData, InvoiceItem } from '@/types/invoice';
 import { calcSubtotal, calcTax, calcTotal, formatCurrency } from '@/lib/format';
+import { newItem } from '@/lib/invoices/empty';
+import { nextPaidEdit } from '@/lib/invoices/rules';
+import { COLOR_PRESETS, FONT_CSS, FONTS } from '@/lib/invoices/style';
+import type { SavedTemplate } from '@/lib/templates';
+import { createInvoiceAction, deleteTemplateAction, saveTemplateAction, updateInvoiceAction } from '@/app/(app)/invoices/actions';
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 
@@ -13,31 +19,7 @@ const INVOICE_TYPES = [
   { group: 'Term Payment', options: ['TERMIN I', 'TERMIN II', 'TERMIN III', 'TERMIN IV', 'TERMIN V'] },
 ];
 
-const FONTS: { value: FontChoice; label: string; desc: string }[] = [
-  { value: 'Caladea',    label: 'Caladea',    desc: 'Serif' },
-  { value: 'Lato',       label: 'Lato',       desc: 'Sans-serif' },
-  { value: 'Montserrat', label: 'Montserrat', desc: 'Geometric' },
-];
-
-const FONT_CSS: Record<FontChoice, string> = {
-  Caladea:    "'Caladea', 'Cambria', Georgia, serif",
-  Lato:       "'Lato', Arial, sans-serif",
-  Montserrat: "'Montserrat', Arial, sans-serif",
-};
-
 // ── Built-in templates ─────────────────────────────────────────────────────────
-
-// ── Color presets ──────────────────────────────────────────────────────────────
-
-const COLOR_PRESETS = [
-  { label: 'Navy',    value: '#1A3A5C' },
-  { label: 'Forest',  value: '#1A6B3C' },
-  { label: 'Indigo',  value: '#3730A3' },
-  { label: 'Violet',  value: '#6D28D9' },
-  { label: 'Rose',    value: '#BE123C' },
-  { label: 'Amber',   value: '#B45309' },
-  { label: 'Slate',   value: '#334155' },
-];
 
 // Template A — IT Consultant, DOWN PAYMENT (Termin I dari III)
 const TPL_A: InvoiceData = {
@@ -150,51 +132,31 @@ const BUILTIN_TEMPLATES = [
   { id: 'tpl-c', name: 'Template C — Software Agency (Termin III)', data: TPL_C },
 ];
 
-interface SavedTemplate { id: string; name: string; data: InvoiceData }
-
-const LS_KEY = 'invoice_saved_templates';
-
-// ── Empty data ─────────────────────────────────────────────────────────────────
-
-function emptyData(): InvoiceData {
-  return {
-    fontFamily: 'Caladea',
-    primaryColor: '#1A3A5C',
-    senderName: '', senderTitle: '', senderLocation: '', senderPhone: '', senderEmail: '',
-    clientCompany: '', clientPIC: '', clientRole: '', clientAddress: '', clientEmail: '',
-    invoiceNumber: '', invoiceType: 'DOWN PAYMENT', poRef: '',
-    invoiceDate: '', dueDate: '',
-    items: [newItem()],
-    discount: 0, taxRate: 0,
-    bankName: '', accountNumber: '', accountHolder: '',
-  };
-}
-
-function newItem(): InvoiceItem {
-  return { id: crypto.randomUUID(), description: '', subDescription: '', spkRef: '', qty: 1, unit: 'Package', price: 0 };
-}
-
 function cloneTemplate(tpl: InvoiceData): InvoiceData {
   return { ...tpl, items: tpl.items.map(i => ({ ...i, id: crypto.randomUUID() }) ) };
 }
 
 // ── Component ──────────────────────────────────────────────────────────────────
 
-export function InvoiceForm() {
-  const [data, setData]                   = useState<InvoiceData>(emptyData);
+type Props = {
+  mode: 'new' | 'edit';
+  invoiceId?: string;
+  editCount?: number;
+  initialData: InvoiceData;
+  templates: SavedTemplate[];
+};
+
+export function InvoiceForm({ mode, invoiceId, editCount: initialEditCount = 0, initialData, templates }: Props) {
+  const router = useRouter();
+  const [data, setData]                   = useState<InvoiceData>(initialData);
+  const [currentId, setCurrentId]         = useState<string | undefined>(mode === 'edit' ? invoiceId : undefined);
+  const [editCount, setEditCount]         = useState(initialEditCount);
   const [loading, setLoading]             = useState(false);
   const [error, setError]                 = useState<string | null>(null);
-  const [savedTemplates, setSavedTemplates] = useState<SavedTemplate[]>([]);
+  const [savedTemplates, setSavedTemplates] = useState<SavedTemplate[]>(templates);
   const [saveMode, setSaveMode]           = useState(false);
   const [saveName, setSaveName]           = useState('');
   const [templateOpen, setTemplateOpen]   = useState(false);
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(LS_KEY);
-      if (raw) setSavedTemplates(JSON.parse(raw));
-    } catch { /* ignore */ }
-  }, []);
 
   const set = useCallback(<K extends keyof InvoiceData>(key: K, value: InvoiceData[K]) => {
     setData(prev => ({ ...prev, [key]: value }));
@@ -209,20 +171,18 @@ export function InvoiceForm() {
     setTemplateOpen(false);
   }
 
-  function handleSave() {
+  async function handleSave() {
     if (!saveName.trim()) return;
-    const tpl: SavedTemplate = { id: crypto.randomUUID(), name: saveName.trim(), data: { ...data } };
-    const updated = [...savedTemplates, tpl];
-    setSavedTemplates(updated);
-    localStorage.setItem(LS_KEY, JSON.stringify(updated));
+    const result = await saveTemplateAction(saveName.trim(), data);
+    if (!result.ok) { setError(result.error); return; }
+    setSavedTemplates(result.templates);
     setSaveMode(false);
     setSaveName('');
   }
 
-  function deleteTemplate(id: string) {
-    const updated = savedTemplates.filter(t => t.id !== id);
-    setSavedTemplates(updated);
-    localStorage.setItem(LS_KEY, JSON.stringify(updated));
+  async function deleteTemplate(id: string) {
+    const result = await deleteTemplateAction(id);
+    if (result.ok) setSavedTemplates(result.templates);
   }
 
   const subtotal = calcSubtotal(data.items);
@@ -235,25 +195,29 @@ export function InvoiceForm() {
     setError(null);
     setLoading(true);
     try {
-      const res = await fetch('/api/generate-pdf', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-      if (!res.ok) throw new Error(await res.text() || 'Failed to generate PDF');
-      const blob = await res.blob();
-      const url  = URL.createObjectURL(blob);
-      const a    = document.createElement('a');
-      a.href     = url;
-      a.download = `Invoice_${data.invoiceNumber.replace(/\//g, '-')}.pdf`;
+      const result = currentId ? await updateInvoiceAction(currentId, data) : await createInvoiceAction(data);
+      if (!result.ok) { setError(result.error); return; }
+      setEditCount(result.editCount);
+      // The PDF route is free and ownership-checked; it serves the saved version.
+      const a = document.createElement('a');
+      a.href = `/invoices/${result.id}/pdf`;
       a.click();
-      URL.revokeObjectURL(url);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'An error occurred');
+      if (!currentId) {
+        // Later clicks become edits, so a double-click cannot create a second invoice.
+        setCurrentId(result.id);
+        router.replace(`/invoices/${result.id}`);
+      }
+      router.refresh();
+    } catch {
+      setError('Something went wrong. Please try again.');
     } finally {
       setLoading(false);
     }
   }
+
+  const pricingNote = currentId
+    ? `Saved edits: ${editCount}. Edit #${nextPaidEdit(editCount)} uses 1 token. Unchanged downloads are free.`
+    : 'Generating this invoice uses 1 token. The next 5 edits are free.';
 
   return (
     <div className="min-h-screen bg-[#E7EBE2]" style={{ fontFamily: fontCss }}>
@@ -261,9 +225,9 @@ export function InvoiceForm() {
       {/* ── Top bar ── */}
       <div className="sticky top-0 z-20 bg-[#E7EBE2]/85 backdrop-blur-md border-b border-[#C9D1C2]">
         <div className="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
-          <Link href="/" className="flex items-center gap-1.5 text-[#5C6A5E] hover:text-[#19261F] transition-colors shrink-0">
+          <Link href="/invoices" className="flex items-center gap-1.5 text-[#5C6A5E] hover:text-[#19261F] transition-colors shrink-0">
             <ArrowLeft size={15} />
-            <span className="text-sm font-medium">Back</span>
+            <span className="text-sm font-medium">Invoices</span>
           </Link>
           <span className="font-mono text-sm font-bold tracking-tight text-[#19261F]">INVOICE<span className="text-[#0B5C42]">·</span>PDF</span>
           <button
@@ -272,9 +236,14 @@ export function InvoiceForm() {
             className="flex items-center gap-1.5 px-4 py-2 rounded-md bg-[#0B5C42] text-[#F6F7F1] font-mono text-[13px] font-bold tracking-tight transition-colors hover:bg-[#094B36] disabled:opacity-50 shrink-0"
           >
             <Download size={14} />
-            {loading ? 'GENERATING…' : 'GENERATE PDF'}
+            {loading ? 'SAVING…' : currentId ? 'SAVE & DOWNLOAD' : 'GENERATE PDF'}
           </button>
         </div>
+      </div>
+
+      <div className="max-w-3xl mx-auto px-4 pt-4">
+        <p className="font-mono text-[11px] text-[#5C6A5E]">{pricingNote}</p>
+        {error && <p className="mt-2 text-sm text-red-700">{error}</p>}
       </div>
 
       <div className="max-w-3xl mx-auto px-4 py-6 space-y-5">
@@ -611,7 +580,7 @@ export function InvoiceForm() {
           className="w-full py-4 rounded-md bg-[#0B5C42] text-[#F6F7F1] font-mono text-sm font-bold tracking-tight transition-colors hover:bg-[#094B36] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           <Download size={18} />
-          {loading ? 'GENERATING PDF…' : 'GENERATE & DOWNLOAD PDF'}
+          {loading ? 'SAVING…' : currentId ? 'SAVE & DOWNLOAD PDF' : 'GENERATE & DOWNLOAD PDF'}
         </button>
 
         <p className="text-center text-xs text-[#8A9587] pb-4">
