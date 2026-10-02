@@ -2,7 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: 'standalone',
-  serverExternalPackages: ['@react-pdf/renderer'],
+  // postgres must stay a real package in standalone: scripts/create-user.mjs imports it directly.
+  serverExternalPackages: ['@react-pdf/renderer', 'postgres'],
 };
 
 export default nextConfig;
