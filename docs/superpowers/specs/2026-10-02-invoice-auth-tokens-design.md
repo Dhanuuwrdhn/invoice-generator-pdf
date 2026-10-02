@@ -67,6 +67,10 @@ Internet ──443──> Caddy (compose landing, ~/bornworks)
 - Backup: cron harian `pg_dump` ke `~/invoice/backups`, simpan 7 terakhir.
 - Akun admin dibuat sekali lewat `docker compose exec app node scripts/create-user.mjs <email>`; password dibaca dari stdin, langsung di-hash, akun ditandai terverifikasi. Password tidak pernah disimpan di repo, env, atau log.
 
+## Admin database UI
+
+CloudBeaver Community Edition (gratis, Apache-2.0) di `https://cloudbeaver.bornworks.biz.id`, container di compose invoice tanpa port host, diakses lewat Caddy. Dua lapis kunci: `basic_auth` Caddy (hash bcrypt di `~/bornworks/.env`, bukan di repo) dan login admin CloudBeaver sendiri. Basic auth wajib aktif sebelum wizard first-run dibuka.
+
 ## Model data (PostgreSQL, Drizzle)
 
 | Tabel | Kolom | Catatan |

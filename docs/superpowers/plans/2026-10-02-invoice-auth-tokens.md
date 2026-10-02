@@ -3987,3 +3987,108 @@ ssh bornworks 'docker rm -f invoice-testdb'
 - [ ] **Step 8: Record ops knowledge**
 
 Add an "Invoice app" section to `D:/dev/agents/skills/bornworks-landing-ops/SKILL.md` covering: repo/branch, `~/invoice` layout, shared `web` network + Caddy block, CI secrets, `create-user.mjs` usage, backup cron and restore command (`gunzip -c backups/<file> | docker compose exec -T postgres psql -U invoice invoice`), and that `ADMIN_EMAILS` grants `/admin`. Copy the file to `D:/dev/claude/skills/bornworks-landing-ops/SKILL.md`.
+
+---
+
+### Task 14: CloudBeaver at `cloudbeaver.bornworks.biz.id`
+
+Web database UI (CloudBeaver Community Edition, Apache-2.0) for the invoice Postgres. Public domain, so it sits behind **two** locks: Caddy `basic_auth` (blocks everything, including CloudBeaver's first-run admin wizard) and CloudBeaver's own admin login. DNS `cloudbeaver.bornworks.biz.id → 43.134.133.227` already exists.
+
+**Files:**
+- Invoice repo: modify `docker-compose.yml`
+- Landing repo: modify `docker-compose.yml` (caddy env), `Caddyfile`
+- VPS: `~/bornworks/.env` (`CB_USER`, `CB_HASH`)
+
+**Interfaces:**
+- Consumes: network `web` and the invoice compose stack (Task 13).
+- Produces: `https://cloudbeaver.bornworks.biz.id` → container alias `cloudbeaver:8978`.
+
+- [ ] **Step 1: Add the service to the invoice compose file**
+
+Add under `services:` in `docker-compose.yml`:
+
+```yaml
+  cloudbeaver:
+    image: dbeaver/cloudbeaver:latest
+    volumes:
+      - cb_workspace:/opt/cloudbeaver/workspace
+    networks:
+      default: {}
+      web:
+        aliases: [cloudbeaver]
+    restart: unless-stopped
+```
+
+and `cb_workspace:` under the top-level `volumes:`. No `ports:` — it is reachable only through Caddy on `web` and talks to `postgres` on the compose default network.
+
+- [ ] **Step 2: Basic-auth credentials (user types the password)**
+
+The user runs this themselves and types a password when prompted (the plaintext never reaches the chat or the repo):
+
+```
+! ssh -t bornworks "cd ~/bornworks && docker compose exec caddy caddy hash-password"
+```
+
+It prints a bcrypt hash (`$2a$14$...`). Store it in the landing `.env` on the VPS with single quotes so Compose does not expand the `$` signs (replace `<HASH>` with the printed value; the user can paste it into this command):
+
+```
+! ssh bornworks "cd ~/bornworks && sed -i '/^CB_USER=/d;/^CB_HASH=/d' .env && printf \"CB_USER=admin\nCB_HASH='%s'\n\" '<HASH>' >> .env && grep -c '^CB_' .env"
+```
+
+Expected: `2`.
+
+- [ ] **Step 3: Caddy reads the credentials from env and proxies the domain**
+
+Landing `docker-compose.yml`, add to the `caddy` service:
+
+```yaml
+    environment:
+      CB_USER: ${CB_USER}
+      CB_HASH: ${CB_HASH}
+```
+
+Landing `Caddyfile`, append:
+
+```
+cloudbeaver.bornworks.biz.id {
+	basic_auth {
+		{$CB_USER} {$CB_HASH}
+	}
+	reverse_proxy cloudbeaver:8978
+}
+```
+
+Commit and push both repos (landing first so Caddy has the block, then invoice so the container exists):
+
+```bash
+cd D:/dev/bornworks/landing-page-bornworks
+git add docker-compose.yml Caddyfile
+git -c user.name=Dhanuuwrdhn -c user.email=dhanuwardhan10@gmail.com commit -m "chore: proxy cloudbeaver.bornworks.biz.id behind basic auth"
+git push origin main
+cd D:/dev/bornworks/invoice-generator-pdf
+git add docker-compose.yml
+git -c user.name=Dhanuuwrdhn -c user.email=dhanuwardhan10@gmail.com commit -m "chore: add cloudbeaver to the compose stack"
+git push origin master
+```
+
+Wait for both CI runs to go green.
+
+- [ ] **Step 4: Verify the lock before anyone opens the wizard**
+
+```bash
+curl -s --ssl-no-revoke -o /dev/null -w "no auth: %{http_code}\n" https://cloudbeaver.bornworks.biz.id/
+ssh bornworks 'docker ps --format "{{.Names}} {{.Ports}}" | grep -i cloudbeaver'
+```
+
+Expected: `no auth: 401`; the cloudbeaver container line shows no `0.0.0.0` port. Do not continue if the first line is anything but 401.
+
+- [ ] **Step 5: First-run setup (user, in the browser)**
+
+1. Open `https://cloudbeaver.bornworks.biz.id`, pass basic auth (`admin` + the password from Step 2).
+2. Finish the wizard: create the CloudBeaver admin with a **different** strong password; disable anonymous access.
+3. New connection → PostgreSQL: host `postgres`, port `5432`, database `invoice`, user `invoice`, password from `ssh bornworks 'grep ^POSTGRES_PASSWORD= ~/invoice/.env'` (user runs it with `!`).
+4. Check `users`, `invoices`, `token_ledger` are visible.
+
+- [ ] **Step 6: Record it in the ops skill**
+
+Add to the "Invoice app" section of `bornworks-landing-ops`: CloudBeaver URL, two-layer auth, `CB_USER`/`CB_HASH` live in `~/bornworks/.env`, how to rotate (`caddy hash-password` → replace `CB_HASH` → `docker compose up -d caddy`), and that its workspace is the `cb_workspace` volume.
