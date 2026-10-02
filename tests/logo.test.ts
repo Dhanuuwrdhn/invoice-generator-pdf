@@ -9,7 +9,7 @@ const USER = '11111111-1111-1111-1111-111111111111';
 
 describe('logo storage', () => {
   beforeEach(async () => {
-    await fs.rm(process.env.UPLOAD_DIR!, { recursive: true, force: true });
+    await fs.rm(path.join('uploads', USER), { recursive: true, force: true });
   });
 
   it('detects formats from magic bytes', () => {
@@ -37,7 +37,6 @@ describe('logo storage', () => {
   });
 
   it('refuses paths that were not produced by saveLogo', async () => {
-    await fs.mkdir(path.join(process.env.UPLOAD_DIR!), { recursive: true });
     expect(await readLogo('../package.json')).toBeNull();
     expect(await readLogo(null)).toBeNull();
   });

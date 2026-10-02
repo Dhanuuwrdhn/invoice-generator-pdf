@@ -6,7 +6,9 @@ export const MAX_LOGO_BYTES = 500 * 1024;
 
 export class InvalidLogoError extends Error {}
 
-const uploadDir = () => process.env.UPLOAD_DIR ?? path.join(process.cwd(), 'uploads');
+// Resolved against the runtime cwd (/app in Docker). Keep this a constant: an env-driven
+// path makes Turbopack trace the whole project into the standalone build.
+const UPLOAD_DIR = 'uploads';
 const REL_PATH_RE = /^[0-9a-f-]{36}\/logo-[0-9a-f-]{36}\.(png|jpg)$/;
 
 export function detectImageFormat(buf: Buffer): 'png' | 'jpg' | null {
@@ -22,15 +24,15 @@ export async function saveLogo(userId: string, buf: Buffer): Promise<string> {
   const format = detectImageFormat(buf);
   if (!format) throw new InvalidLogoError('Logo must be a PNG or JPEG image.');
   const relPath = `${userId}/logo-${randomUUID()}.${format}`;
-  await fs.mkdir(path.join(uploadDir(), userId), { recursive: true });
-  await fs.writeFile(path.join(uploadDir(), relPath), buf);
+  await fs.mkdir(path.join(UPLOAD_DIR, userId), { recursive: true });
+  await fs.writeFile(path.join(UPLOAD_DIR, relPath), buf);
   return relPath;
 }
 
 export async function readLogo(relPath: string | null): Promise<{ data: Buffer; format: 'png' | 'jpg' } | null> {
   if (!relPath || !REL_PATH_RE.test(relPath)) return null;
   try {
-    const data = await fs.readFile(path.join(uploadDir(), relPath));
+    const data = await fs.readFile(path.join(UPLOAD_DIR, relPath));
     const format = detectImageFormat(data);
     return format ? { data, format } : null;
   } catch {

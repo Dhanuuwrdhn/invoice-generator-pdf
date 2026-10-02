@@ -1,0 +1,38 @@
+services:
+  app:
+    # CI pushes this image; TAG is set to the commit SHA on deploy.
+    image: ghcr.io/dhanuuwrdhn/invoice-generator-pdf:${TAG:-latest}
+    env_file: .env
+    volumes:
+      - uploads:/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      default: {}
+      web:
+        aliases: [invoice-app]
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: invoice
+      POSTGRES_USER: invoice
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U invoice -d invoice"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  uploads:
+  pg_data:
+
+networks:
+  web:
+    external: true
