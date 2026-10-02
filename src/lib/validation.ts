@@ -53,3 +53,18 @@ export const invoiceDataSchema = z.object({
   accountNumber: text(50),
   accountHolder: text(),
 });
+
+export const settingsSchema = z.object({
+  fontFamily: z.enum(FONT_CHOICES),
+  primaryColor: hexColor,
+  senderName: text(),
+  senderTitle: text(),
+  senderLocation: text(),
+  senderPhone: text(50),
+  senderEmail: text(254),
+  bankName: text(100),
+  accountNumber: text(50),
+  accountHolder: text(),
+});
+
+export type UserSettingsInput = z.infer<typeof settingsSchema>;

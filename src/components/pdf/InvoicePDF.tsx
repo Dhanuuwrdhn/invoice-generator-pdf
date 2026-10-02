@@ -1,6 +1,6 @@
 import React from 'react';
 import path from 'path';
-import { Document, Page, View, Text, Font } from '@react-pdf/renderer';
+import { Document, Page, View, Text, Font, Image } from '@react-pdf/renderer';
 import { InvoiceData, InvoiceItem, FontChoice } from '@/types/invoice';
 import { formatCurrency, calcSubtotal, calcTax, calcTotal } from '@/lib/format';
 import { numberToWords } from '@/lib/terbilang';
@@ -60,6 +60,7 @@ function buildStyles(f: FontChoice, primary: string) {
     headerRow:  { flexDirection: 'row' as const, borderBottomWidth: 2.5, borderBottomColor: primary, paddingBottom: 8, marginBottom: 10 },
     hLeft:      { width: CW * 0.55 },
     hRight:     { width: CW * 0.45, alignItems: 'flex-end' as const },
+    logo:       { height: 40, maxWidth: 160, objectFit: 'contain' as const, marginBottom: 6 },
     senderName: { ...B, fontSize: 14, color: primary, marginBottom: 3 },
     senderTitle:{ fontFamily: f, fontSize: 9, color: G555, marginBottom: 2 },
     senderCtc:  { fontFamily: f, fontSize: 8, color: G777, marginBottom: 1 },
@@ -128,7 +129,7 @@ function buildStyles(f: FontChoice, primary: string) {
 
 function itemAmt(item: InvoiceItem) { return item.qty * item.price; }
 
-export function InvoicePDF({ data }: { data: InvoiceData }) {
+export function InvoicePDF({ data, logo }: { data: InvoiceData; logo?: { data: Buffer; format: 'png' | 'jpg' } | null }) {
   const s = buildStyles(data.fontFamily || 'Caladea', data.primaryColor || '#1A3A5C');
   const subtotal = calcSubtotal(data.items);
   const taxAmt   = calcTax(subtotal, data.discount, data.taxRate);
@@ -141,6 +142,8 @@ export function InvoicePDF({ data }: { data: InvoiceData }) {
         {/* 1. HEADER */}
         <View style={s.headerRow}>
           <View style={s.hLeft}>
+            {/* eslint-disable-next-line jsx-a11y/alt-text -- @react-pdf Image has no alt prop */}
+            {logo ? <Image src={logo} style={s.logo} /> : null}
             <Text style={s.senderName}>{data.senderName}</Text>
             <Text style={s.senderTitle}>{data.senderTitle}</Text>
             <Text style={s.senderCtc}>{data.senderLocation}</Text>
