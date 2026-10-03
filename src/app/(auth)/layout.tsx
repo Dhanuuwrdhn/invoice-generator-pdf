@@ -8,6 +8,9 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           INVOICE<span className="text-[#0B5C42]">·</span>PDF
         </Link>
         <div className="bg-white rounded-lg border border-[#C9D1C2] p-6">{children}</div>
+        <Link href="/" className="mt-4 block text-center text-sm text-[#5C6A5E] hover:text-[#19261F]">
+          ← Back to home
+        </Link>
       </div>
     </main>
   );

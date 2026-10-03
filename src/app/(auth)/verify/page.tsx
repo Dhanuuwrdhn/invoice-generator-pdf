@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { getCurrentUser } from '@/lib/auth/current-user';
 import { logoutAction } from '../actions';
@@ -23,6 +24,18 @@ export default async function VerifyPage({ searchParams }: { searchParams: Promi
       <p className="text-sm text-[#5C6A5E] mb-4">
         We sent a verification link{user ? ` to ${user.email}` : ''}. It expires in 1 hour.
       </p>
+      <p className="text-sm text-[#5C6A5E] mb-4">
+        Can&apos;t find it? Check your <strong>Spam</strong> or <strong>Promotions</strong> folder for an email
+        from noreply@bornworks.biz.id.
+      </p>
+      {!user && (
+        <p className="text-sm text-[#5C6A5E]">
+          Still nothing?{' '}
+          <Link href="/login" className="font-semibold text-[#0B5C42] underline">
+            Sign in to resend the link
+          </Link>
+        </p>
+      )}
       {user && (
         <div className="space-y-3">
           <ResendVerificationButton />

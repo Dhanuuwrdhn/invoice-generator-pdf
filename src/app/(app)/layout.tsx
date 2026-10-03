@@ -13,6 +13,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             INVOICE<span className="text-[#0B5C42]">·</span>PDF
           </Link>
           <nav className="flex gap-3 text-[#5C6A5E]">
+            <Link href="/" className="hover:text-[#19261F]">Home</Link>
             <Link href="/invoices" className="hover:text-[#19261F]">Invoices</Link>
             <Link href="/settings" className="hover:text-[#19261F]">Settings</Link>
             {isAdminEmail(user.email) && <Link href="/admin" className="hover:text-[#19261F]">Admin</Link>}
