@@ -2,7 +2,7 @@ import { and, eq, isNull } from 'drizzle-orm';
 import { getDb } from '@/db';
 import { users, type User } from '@/db/schema';
 import { grantTokens, SIGNUP_BONUS } from '@/lib/tokens';
-import { consumeEmailToken, issueEmailToken } from './email-tokens';
+import { consumeEmailToken, isEmailTokenUsable, issueEmailToken } from './email-tokens';
 import { hashPassword, verifyPassword } from './password.mjs';
 import { deleteAllSessions } from './session';
 
@@ -65,6 +65,8 @@ export async function requestPasswordReset(rawEmail: string): Promise<string | n
 }
 
 export async function resetPassword(rawToken: string, newPassword: string): Promise<boolean> {
+  // Reject junk tokens before paying for scrypt; the consume below stays the authoritative check.
+  if (!(await isEmailTokenUsable(rawToken, 'reset'))) return false;
   const passwordHash = await hashPassword(newPassword);
   return getDb().transaction(async (tx) => {
     const userId = await consumeEmailToken(rawToken, 'reset', tx);

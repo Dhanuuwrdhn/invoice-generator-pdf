@@ -19,6 +19,23 @@ export async function issueEmailToken(userId: string, purpose: EmailTokenPurpose
   return raw;
 }
 
+// Cheap pre-check (no write) so callers can skip expensive work for junk tokens.
+export async function isEmailTokenUsable(raw: string, purpose: EmailTokenPurpose): Promise<boolean> {
+  const rows = await getDb()
+    .select({ userId: emailTokens.userId })
+    .from(emailTokens)
+    .where(
+      and(
+        eq(emailTokens.tokenHash, hashToken(raw)),
+        eq(emailTokens.purpose, purpose),
+        isNull(emailTokens.usedAt),
+        gt(emailTokens.expiresAt, sql`now()`),
+      ),
+    )
+    .limit(1);
+  return rows.length > 0;
+}
+
 // Single UPDATE so two concurrent clicks cannot both succeed.
 export async function consumeEmailToken(raw: string, purpose: EmailTokenPurpose, tx?: Tx): Promise<string | null> {
   const rows = await (tx ?? getDb())

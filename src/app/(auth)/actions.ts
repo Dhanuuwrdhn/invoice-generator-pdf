@@ -7,7 +7,7 @@ import { issueEmailToken } from '@/lib/auth/email-tokens';
 import { sendAccountExistsEmail, sendResetEmail, sendVerificationEmail } from '@/lib/auth/emails';
 import { authenticate, registerUser, requestPasswordReset, resetPassword, verifyEmail } from '@/lib/auth/service';
 import { createSession, deleteSession, SESSION_COOKIE } from '@/lib/auth/session';
-import { hitRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
+import { allowLoginAttempt, hitRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 import { getClientIp } from '@/lib/request-ip';
 import { credentialsSchema, loginSchema } from '@/lib/validation';
 
@@ -43,7 +43,7 @@ export async function registerAction(_prev: FormState, formData: FormData): Prom
 export async function loginAction(_prev: FormState, formData: FormData): Promise<FormState> {
   const parsed = loginSchema.safeParse({ email: formData.get('email'), password: formData.get('password') });
   if (!parsed.success) return { error: 'Invalid email or password.' };
-  if (!(await allowed('login', `${await ip()}:${parsed.data.email}`))) return { error: TOO_MANY };
+  if (!(await allowLoginAttempt(await ip(), parsed.data.email))) return { error: TOO_MANY };
 
   const user = await authenticate(parsed.data.email, parsed.data.password);
   if (!user) return { error: 'Invalid email or password.' };
@@ -94,6 +94,7 @@ export async function resetAction(_prev: FormState, formData: FormData): Promise
   const token = String(formData.get('token') ?? '');
   const password = credentialsSchema.shape.password.safeParse(formData.get('password'));
   if (!password.success) return { error: 'Password must be at least 8 characters.' };
+  if (!(await allowed('reset', await ip()))) return { error: TOO_MANY };
   if (!token || !(await resetPassword(token, password.data))) {
     return { error: 'This link is invalid or has expired. Request a new one.' };
   }
