@@ -29,9 +29,21 @@ services:
       retries: 10
     restart: unless-stopped
 
+  # Database UI; no host port, reachable only through Caddy (basic auth) on the web network.
+  cloudbeaver:
+    image: dbeaver/cloudbeaver:latest
+    volumes:
+      - cb_workspace:/opt/cloudbeaver/workspace
+    networks:
+      default: {}
+      web:
+        aliases: [cloudbeaver]
+    restart: unless-stopped
+
 volumes:
   uploads:
   pg_data:
+  cb_workspace:
 
 networks:
   web:
