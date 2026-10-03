@@ -1,8 +1,9 @@
 import { randomUUID } from 'node:crypto';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { MAX_LOGO_BYTES } from './logo-limits';
 
-export const MAX_LOGO_BYTES = 500 * 1024;
+export { MAX_LOGO_BYTES };
 
 export class InvalidLogoError extends Error {}
 

@@ -13,7 +13,7 @@ const SPECS = [
   { tag: 'PPN',        title: 'Tax & discount, live',  desc: 'Subtotal, discount, and tax recompute the moment you change a figure.' },
   { tag: 'TEMPLATE',   title: 'Save and reuse',        desc: 'Keep a client or a service preset and load it next time in one click.' },
   { tag: 'CETAK',      title: 'Print-ready PDF',       desc: 'Headed table, terbilang box, and signature block, sized for A4.' },
-  { tag: 'GRATIS',     title: 'No account, no cost',   desc: 'Open it, fill it, download it. Nothing is stored on a server.' },
+  { tag: 'GRATIS',     title: '10 free invoices',      desc: 'Create an account and get 10 tokens. Your invoices are saved so you can edit and re-download them.' },
 ];
 
 const STEPS = [
@@ -31,12 +31,17 @@ export default function LandingPage() {
         <span className="font-mono text-sm font-bold tracking-tight">
           INVOICE<span className="text-[#0B5C42]">·</span>PDF
         </span>
-        <Link
-          href="/invoices/new"
-          className="font-mono text-[13px] font-bold tracking-tight px-4 py-2 rounded-md bg-[#0B5C42] text-[#F6F7F1] transition-colors hover:bg-[#094B36]"
-        >
-          NEW INVOICE →
-        </Link>
+        <div className="flex items-center gap-4">
+          <Link href="/login" className="font-mono text-[13px] font-bold tracking-tight text-[#33433A] hover:text-[#0B5C42]">
+            SIGN IN
+          </Link>
+          <Link
+            href="/register"
+            className="font-mono text-[13px] font-bold tracking-tight px-4 py-2 rounded-md bg-[#0B5C42] text-[#F6F7F1] transition-colors hover:bg-[#094B36]"
+          >
+            CREATE ACCOUNT →
+          </Link>
+        </div>
       </nav>
 
       {/* ── Hero ── */}
@@ -167,7 +172,7 @@ export default function LandingPage() {
             Your next invoice is a minute away.
           </h2>
           <p className="text-[#9DAD9F] mb-9 max-w-md mx-auto">
-            No registration, no payment, nothing stored. Open, fill, download.
+            Free account with 10 tokens. Your invoices are saved to edit and re-download anytime.
           </p>
           <Link
             href="/invoices/new"

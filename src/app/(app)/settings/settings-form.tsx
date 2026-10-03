@@ -3,6 +3,7 @@
 import { useActionState, useState } from 'react';
 import type { FormState } from '@/app/(auth)/actions';
 import { COLOR_PRESETS, FONT_CSS, FONTS } from '@/lib/invoices/style';
+import { MAX_LOGO_BYTES } from '@/lib/logo-limits';
 import type { UserSettings } from '@/lib/settings';
 import { changePasswordAction, removeLogoAction, saveSettingsAction, uploadLogoAction } from './actions';
 
@@ -35,6 +36,7 @@ export function SettingsForm({ settings, logoVersion }: { settings: UserSettings
   const [logoState, logoAction, uploading] = useActionState(uploadLogoAction, {});
   const [removeState, removeAction] = useActionState(removeLogoAction, {});
   const [pwState, pwAction, changing] = useActionState(changePasswordAction, {});
+  const [logoError, setLogoError] = useState<string | null>(null);
   const [font, setFont] = useState(settings.fontFamily);
   const [color, setColor] = useState(settings.primaryColor);
 
@@ -97,12 +99,25 @@ export function SettingsForm({ settings, logoVersion }: { settings: UserSettings
         ) : (
           <p className="text-sm text-[#5C6A5E]">No logo yet.</p>
         )}
-        <form action={logoAction} className="flex items-center gap-3 flex-wrap">
+        <form
+          action={logoAction}
+          // Server actions reject bodies over 1 MB before our code runs, so check size here first.
+          onSubmit={(e) => {
+            const file = (e.currentTarget.elements.namedItem('logo') as HTMLInputElement).files?.[0];
+            if (file && file.size > MAX_LOGO_BYTES) {
+              e.preventDefault();
+              setLogoError('Logo must be 500 KB or smaller.');
+            } else {
+              setLogoError(null);
+            }
+          }}
+          className="flex items-center gap-3 flex-wrap"
+        >
           <input type="file" name="logo" accept="image/png,image/jpeg" className="text-sm" />
           <button disabled={uploading} className={button}>{uploading ? 'UPLOADING…' : 'UPLOAD'}</button>
         </form>
         <p className="text-xs text-[#8A9587]">PNG or JPEG, max 500 KB. Existing invoices keep their old logo.</p>
-        <Feedback state={logoState} />
+        {logoError ? <p className="text-sm text-red-700">{logoError}</p> : <Feedback state={logoState} />}
         {logoVersion && (
           <form action={removeAction}>
             <button className="text-sm text-[#5C6A5E] hover:text-red-700">Remove logo</button>
