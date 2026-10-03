@@ -1,9 +1,22 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
+const description =
+  "Buat invoice PDF profesional untuk freelancer & konsultan: terbilang otomatis, termin, PPN, dan logo sendiri. Gratis 10 invoice.";
+
 export const metadata: Metadata = {
-  title: "InvoicePDF — Professional Invoices",
-  description: "Generate clean, professional PDF invoices in seconds.",
+  metadataBase: new URL("https://invoice.bornworks.biz.id"),
+  title: "InvoicePDF — Invoice PDF Profesional dalam Detik",
+  description,
+  openGraph: {
+    title: "InvoicePDF — Invoice PDF Profesional dalam Detik",
+    description,
+    url: "/",
+    siteName: "InvoicePDF by bornworks",
+    locale: "id_ID",
+    type: "website",
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 export default function RootLayout({
