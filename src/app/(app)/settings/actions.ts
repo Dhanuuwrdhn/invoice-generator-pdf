@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import type { FormState } from '@/app/(auth)/actions';
-import { requireVerifiedUser } from '@/lib/auth/current-user';
+import { requireVerifiedUser, setSessionCookie } from '@/lib/auth/current-user';
 import { changePassword } from '@/lib/auth/service';
 import { InvalidLogoError, saveLogo } from '@/lib/logo';
 import { saveSettings, setLogoPath } from '@/lib/settings';
@@ -42,6 +42,8 @@ export async function changePasswordAction(_prev: FormState, formData: FormData)
   const user = await requireVerifiedUser();
   const next = credentialsSchema.shape.password.safeParse(formData.get('newPassword'));
   if (!next.success) return { error: 'New password must be at least 8 characters.' };
-  const ok = await changePassword(user.id, String(formData.get('currentPassword') ?? ''), next.data);
-  return ok ? { message: 'Password changed.' } : { error: 'Current password is wrong.' };
+  const session = await changePassword(user.id, String(formData.get('currentPassword') ?? ''), next.data);
+  if (!session) return { error: 'Current password is wrong.' };
+  await setSessionCookie(session.token, session.expiresAt);
+  return { message: 'Password changed. Other devices have been signed out.' };
 }

@@ -4,7 +4,7 @@ import { users, type User } from '@/db/schema';
 import { grantTokens, SIGNUP_BONUS } from '@/lib/tokens';
 import { consumeEmailToken, isEmailTokenUsable, issueEmailToken } from './email-tokens';
 import { hashPassword, verifyPassword } from './password.mjs';
-import { deleteAllSessions } from './session';
+import { createSession, deleteAllSessions } from './session';
 
 export function normalizeEmail(email: string): string {
   return email.trim().toLowerCase();
@@ -77,9 +77,19 @@ export async function resetPassword(rawToken: string, newPassword: string): Prom
   });
 }
 
-export async function changePassword(userId: string, currentPassword: string, newPassword: string): Promise<boolean> {
+// Signs out every session (a password change usually means suspected access) and
+// returns a fresh one for the caller; false when the current password is wrong.
+export async function changePassword(
+  userId: string,
+  currentPassword: string,
+  newPassword: string,
+): Promise<{ token: string; expiresAt: Date } | false> {
   const [user] = await getDb().select().from(users).where(eq(users.id, userId));
   if (!user || !(await verifyPassword(currentPassword, user.passwordHash))) return false;
-  await getDb().update(users).set({ passwordHash: await hashPassword(newPassword) }).where(eq(users.id, userId));
-  return true;
+  const passwordHash = await hashPassword(newPassword);
+  await getDb().transaction(async (tx) => {
+    await tx.update(users).set({ passwordHash }).where(eq(users.id, userId));
+    await deleteAllSessions(userId, tx);
+  });
+  return createSession(userId);
 }

@@ -73,10 +73,19 @@ describe('account service', () => {
     expect(await requestPasswordReset('ghost@example.com')).toBeNull();
   });
 
+  it('changing the password signs out every other session', async () => {
+    const { userId } = await registered();
+    const other = await createSession(userId);
+    const result = await changePassword(userId, 'password1', 'new-password');
+    expect(result).not.toBe(false);
+    expect(await getUserBySessionToken(other.token)).toBeNull();
+    if (result) expect((await getUserBySessionToken(result.token))?.id).toBe(userId);
+  });
+
   it('changes the password only with the current one', async () => {
     const { userId } = await registered();
     expect(await changePassword(userId, 'wrong-pass', 'new-password')).toBe(false);
-    expect(await changePassword(userId, 'password1', 'new-password')).toBe(true);
+    expect(await changePassword(userId, 'password1', 'new-password')).not.toBe(false);
     expect(await authenticate('a@example.com', 'new-password')).not.toBeNull();
   });
 
