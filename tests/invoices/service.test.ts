@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { eq } from 'drizzle-orm';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { getDb } from '@/db';
@@ -174,5 +175,51 @@ describe('invoice service', () => {
     const { id } = await createInvoice(owner.id, data(), null, render);
     expect(await getInvoicePdf(other.id, id, render)).toBeNull();
     expect(await getInvoicePdf(owner.id, 'not-a-uuid', render)).toBeNull();
+  });
+
+  it('creates one invoice for two concurrent requests with the same idempotency key', async () => {
+    const user = await makeUser('a@example.com', { balance: 3 });
+    const key = randomUUID();
+    const [a, b] = await Promise.all([
+      createInvoice(user.id, data(), null, render, key),
+      createInvoice(user.id, data(), null, render, key),
+    ]);
+    expect(a.id).toBe(b.id);
+    expect([a.created, b.created].sort()).toEqual([false, true]);
+    expect(await getDb().select().from(invoices)).toHaveLength(1);
+    expect(await getDb().select().from(tokenLedger).where(eq(tokenLedger.reason, 'invoice_create'))).toHaveLength(1);
+    expect(await balance(user.id)).toBe(2);
+    expect(await ledgerSum(user.id)).toBe(2);
+  });
+
+  it('returns the first invoice for a retried key without charging again', async () => {
+    const user = await makeUser('a@example.com', { balance: 3 });
+    const key = randomUUID();
+    const first = await createInvoice(user.id, data('INV-1'), null, render, key);
+    const retry = await createInvoice(user.id, data('INV-1'), null, render, key);
+    expect(retry).toEqual({ id: first.id, created: false });
+    expect(await balance(user.id)).toBe(2);
+  });
+
+  it('scopes idempotency keys per user and treats new keys as new invoices', async () => {
+    const owner = await makeUser('a@example.com', { balance: 3 });
+    const other = await makeUser('b@example.com', { balance: 3 });
+    const key = randomUUID();
+    const a = await createInvoice(owner.id, data(), null, render, key);
+    const b = await createInvoice(other.id, data(), null, render, key);
+    const c = await createInvoice(owner.id, data(), null, render, randomUUID());
+    expect(new Set([a.id, b.id, c.id]).size).toBe(3);
+    expect(await balance(owner.id)).toBe(1);
+    expect(await balance(other.id)).toBe(2);
+  });
+
+  it('lets a retry through after the first attempt with that key failed', async () => {
+    const user = await makeUser('a@example.com', { balance: 1 });
+    const key = randomUUID();
+    await expect(createInvoice(user.id, data(), null, failingRender, key)).rejects.toThrow('render failed');
+    const retry = await createInvoice(user.id, data(), null, render, key);
+    expect(retry.created).toBe(true);
+    expect(await balance(user.id)).toBe(0);
+    expect(await ledgerSum(user.id)).toBe(0);
   });
 });

@@ -26,20 +26,34 @@ function sameData(a: InvoiceData, b: InvoiceData): boolean {
   return JSON.stringify(invoiceDataSchema.parse(a)) === JSON.stringify(invoiceDataSchema.parse(b));
 }
 
+// The unique (user_id, idempotency_key) index makes a second insert with the same key
+// wait for the first transaction: if it commits, return its invoice without charging;
+// if it rolls back (out of tokens, broken PDF), this attempt goes ahead.
 export async function createInvoice(
   userId: string,
   data: InvoiceData,
   logoPath: string | null,
   render: RenderPdf,
-): Promise<{ id: string }> {
-  const id = randomUUID();
-  await getDb().transaction(async (tx) => {
+  idempotencyKey?: string,
+): Promise<{ id: string; created: boolean }> {
+  return getDb().transaction(async (tx) => {
     // Rendering inside the transaction means a broken PDF never costs a token.
     const pdf = await render(data, logoPath);
-    await tx.insert(invoices).values({ id, userId, invoiceNumber: data.invoiceNumber, data, logoPath, pdf });
-    await chargeToken(tx, userId, 'invoice_create', id);
+    const [inserted] = await tx
+      .insert(invoices)
+      .values({ id: randomUUID(), userId, invoiceNumber: data.invoiceNumber, data, logoPath, pdf, idempotencyKey })
+      .onConflictDoNothing({ target: [invoices.userId, invoices.idempotencyKey] })
+      .returning({ id: invoices.id });
+    if (!inserted) {
+      const [existing] = await tx
+        .select({ id: invoices.id })
+        .from(invoices)
+        .where(and(eq(invoices.userId, userId), eq(invoices.idempotencyKey, idempotencyKey!)));
+      return { id: existing.id, created: false };
+    }
+    await chargeToken(tx, userId, 'invoice_create', inserted.id);
+    return { id: inserted.id, created: true };
   });
-  return { id };
 }
 
 export async function updateInvoice(
