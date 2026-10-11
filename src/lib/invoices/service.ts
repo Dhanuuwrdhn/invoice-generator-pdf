@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { and, desc, eq, sql } from 'drizzle-orm';
+import { and, desc, eq, getTableColumns, isNull, sql } from 'drizzle-orm';
 import { getDb } from '@/db';
 import { invoices, type Invoice } from '@/db/schema';
 import { chargeToken } from '@/lib/tokens';
@@ -14,6 +14,10 @@ export class InvoiceNotFoundError extends Error {
     super('Invoice not found');
   }
 }
+
+// Everything but the stored PDF, which only the download needs.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const { pdf: _pdf, ...invoiceColumns } = getTableColumns(invoices);
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -30,10 +34,10 @@ export async function createInvoice(
 ): Promise<{ id: string }> {
   const id = randomUUID();
   await getDb().transaction(async (tx) => {
-    await tx.insert(invoices).values({ id, userId, invoiceNumber: data.invoiceNumber, data, logoPath });
-    await chargeToken(tx, userId, 'invoice_create', id);
     // Rendering inside the transaction means a broken PDF never costs a token.
-    await render(data, logoPath);
+    const pdf = await render(data, logoPath);
+    await tx.insert(invoices).values({ id, userId, invoiceNumber: data.invoiceNumber, data, logoPath, pdf });
+    await chargeToken(tx, userId, 'invoice_create', id);
   });
   return { id };
 }
@@ -47,7 +51,7 @@ export async function updateInvoice(
   if (!UUID_RE.test(id)) throw new InvoiceNotFoundError();
   return getDb().transaction(async (tx) => {
     const [current] = await tx
-      .select()
+      .select(invoiceColumns)
       .from(invoices)
       .where(and(eq(invoices.id, id), eq(invoices.userId, userId)))
       .for('update');
@@ -56,13 +60,13 @@ export async function updateInvoice(
       return { unchanged: true, editCount: current.editCount, charged: false };
     }
     const editCount = current.editCount + 1;
+    const pdf = await render(data, current.logoPath);
     await tx
       .update(invoices)
-      .set({ data, invoiceNumber: data.invoiceNumber, editCount, updatedAt: new Date() })
+      .set({ data, invoiceNumber: data.invoiceNumber, editCount, pdf, updatedAt: new Date() })
       .where(eq(invoices.id, id));
     const charged = isPaidEdit(editCount);
     if (charged) await chargeToken(tx, userId, 'invoice_edit', id);
-    await render(data, current.logoPath);
     return { unchanged: false, editCount, charged };
   });
 }
@@ -70,10 +74,29 @@ export async function updateInvoice(
 export async function getInvoice(userId: string, id: string): Promise<Invoice | null> {
   if (!UUID_RE.test(id)) return null;
   const [row] = await getDb()
-    .select()
+    .select(invoiceColumns)
     .from(invoices)
     .where(and(eq(invoices.id, id), eq(invoices.userId, userId)));
   return row ?? null;
+}
+
+// Invoices saved before PDFs were stored render once here and keep the result.
+// The IS NULL guard keeps a concurrent edit's newer PDF from being overwritten.
+export async function getInvoicePdf(
+  userId: string,
+  id: string,
+  render: RenderPdf,
+): Promise<{ invoiceNumber: string; pdf: Buffer } | null> {
+  if (!UUID_RE.test(id)) return null;
+  const [row] = await getDb()
+    .select({ invoiceNumber: invoices.invoiceNumber, pdf: invoices.pdf, data: invoices.data, logoPath: invoices.logoPath })
+    .from(invoices)
+    .where(and(eq(invoices.id, id), eq(invoices.userId, userId)));
+  if (!row) return null;
+  if (row.pdf) return { invoiceNumber: row.invoiceNumber, pdf: row.pdf };
+  const pdf = await render(row.data, row.logoPath);
+  await getDb().update(invoices).set({ pdf }).where(and(eq(invoices.id, id), isNull(invoices.pdf)));
+  return { invoiceNumber: row.invoiceNumber, pdf };
 }
 
 export async function listInvoices(userId: string) {
