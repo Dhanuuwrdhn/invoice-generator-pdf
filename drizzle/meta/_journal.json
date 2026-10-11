@@ -8,6 +8,13 @@
       "when": 1790930300634,
       "tag": "0000_fuzzy_the_initiative",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791729790527,
+      "tag": "0001_hard_vindicator",
+      "breakpoints": true
     }
   ]
 }

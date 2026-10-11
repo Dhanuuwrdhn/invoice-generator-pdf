@@ -1,8 +1,10 @@
 import { sql } from 'drizzle-orm';
-import { check, index, integer, jsonb, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { check, customType, index, integer, jsonb, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 import type { InvoiceData } from '../types/invoice';
 
 const tz = { withTimezone: true } as const;
+
+const bytea = customType<{ data: Buffer }>({ dataType: () => 'bytea' });
 
 export const users = pgTable(
   'users',
@@ -65,6 +67,8 @@ export const templates = pgTable(
 
 // logo_path is a column (not inside data) so the client can never point an
 // invoice at another user's file; it snapshots the logo at creation time.
+// pdf is the render that validated the last save; data and the logo file never
+// change without a new render, so downloads serve it as is.
 export const invoices = pgTable(
   'invoices',
   {
@@ -73,6 +77,7 @@ export const invoices = pgTable(
     invoiceNumber: text('invoice_number').notNull(),
     data: jsonb('data').$type<InvoiceData>().notNull(),
     logoPath: text('logo_path'),
+    pdf: bytea('pdf'),
     editCount: integer('edit_count').notNull().default(0),
     createdAt: timestamp('created_at', tz).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', tz).notNull().defaultNow(),
@@ -103,4 +108,4 @@ export const rateLimits = pgTable('rate_limits', {
 });
 
 export type User = typeof users.$inferSelect;
-export type Invoice = typeof invoices.$inferSelect;
+export type Invoice = Omit<typeof invoices.$inferSelect, 'pdf'>;
