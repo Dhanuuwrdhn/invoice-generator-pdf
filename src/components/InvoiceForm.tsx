@@ -151,6 +151,8 @@ export function InvoiceForm({ mode, invoiceId, editCount: initialEditCount = 0, 
   const [data, setData]                   = useState<InvoiceData>(initialData);
   const [currentId, setCurrentId]         = useState<string | undefined>(mode === 'edit' ? invoiceId : undefined);
   const [editCount, setEditCount]         = useState(initialEditCount);
+  // One key per opened "new invoice" form, kept across retries and double clicks.
+  const [idempotencyKey]                  = useState(() => crypto.randomUUID());
   const [loading, setLoading]             = useState(false);
   const [error, setError]                 = useState<string | null>(null);
   const [savedTemplates, setSavedTemplates] = useState<SavedTemplate[]>(templates);
@@ -195,7 +197,7 @@ export function InvoiceForm({ mode, invoiceId, editCount: initialEditCount = 0, 
     setError(null);
     setLoading(true);
     try {
-      const result = currentId ? await updateInvoiceAction(currentId, data) : await createInvoiceAction(data);
+      const result = currentId ? await updateInvoiceAction(currentId, data) : await createInvoiceAction(data, idempotencyKey);
       if (!result.ok) { setError(result.error); return; }
       setEditCount(result.editCount);
       // The PDF route is free and ownership-checked; it serves the saved version.

@@ -1,5 +1,5 @@
 import { sql } from 'drizzle-orm';
-import { check, customType, index, integer, jsonb, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { check, customType, index, integer, jsonb, pgTable, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
 import type { InvoiceData } from '../types/invoice';
 
 const tz = { withTimezone: true } as const;
@@ -69,6 +69,8 @@ export const templates = pgTable(
 // invoice at another user's file; it snapshots the logo at creation time.
 // pdf is the render that validated the last save; data and the logo file never
 // change without a new render, so downloads serve it as is.
+// idempotency_key comes from the "new invoice" form so a retried or doubled
+// submit returns the first invoice instead of creating (and charging) another.
 export const invoices = pgTable(
   'invoices',
   {
@@ -78,11 +80,15 @@ export const invoices = pgTable(
     data: jsonb('data').$type<InvoiceData>().notNull(),
     logoPath: text('logo_path'),
     pdf: bytea('pdf'),
+    idempotencyKey: text('idempotency_key'),
     editCount: integer('edit_count').notNull().default(0),
     createdAt: timestamp('created_at', tz).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', tz).notNull().defaultNow(),
   },
-  (t) => [index('invoices_user_created_idx').on(t.userId, t.createdAt.desc())],
+  (t) => [
+    index('invoices_user_created_idx').on(t.userId, t.createdAt.desc()),
+    uniqueIndex('invoices_user_idempotency_key_idx').on(t.userId, t.idempotencyKey),
+  ],
 );
 
 export const tokenLedger = pgTable(

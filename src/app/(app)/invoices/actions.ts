@@ -27,15 +27,23 @@ function invalid(error: z.ZodError): { ok: false; error: string } {
   return { ok: false, error: `Invalid field "${issue.path.join('.')}": ${issue.message}` };
 }
 
-export async function createInvoiceAction(input: unknown): Promise<SaveResult> {
+// idempotencyKey is generated once per "new invoice" form, so a retried or doubled
+// submit gets the first invoice back instead of a second one. A replay is saved as
+// an edit of that invoice: free when the data matches, otherwise the usual edit rules.
+export async function createInvoiceAction(input: unknown, idempotencyKey: unknown): Promise<SaveResult> {
   const user = await requireVerifiedUser();
   const parsed = invoiceDataSchema.safeParse(input);
   if (!parsed.success) return invalid(parsed.error);
+  const key = z.uuid().safeParse(idempotencyKey);
+  if (!key.success) return { ok: false, error: GENERIC };
   try {
     const { logoPath } = await getSettings(user.id);
-    const { id } = await createInvoice(user.id, parsed.data, logoPath, render);
+    const { id, created } = await createInvoice(user.id, parsed.data, logoPath, render, key.data);
+    const result = created
+      ? { editCount: 0, charged: true, unchanged: false }
+      : await updateInvoice(user.id, id, parsed.data, render);
     revalidatePath('/', 'layout');
-    return { ok: true, id, editCount: 0, charged: true, unchanged: false };
+    return { ok: true, id, ...result };
   } catch (err) {
     if (err instanceof OutOfTokensError) return { ok: false, error: OUT_OF_TOKENS };
     console.error('[createInvoice]', { userId: user.id, err });

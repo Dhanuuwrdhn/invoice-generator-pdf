@@ -15,6 +15,13 @@
       "when": 1791729790527,
       "tag": "0001_hard_vindicator",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791730486532,
+      "tag": "0002_blushing_firestar",
+      "breakpoints": true
     }
   ]
 }
